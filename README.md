@@ -53,8 +53,8 @@ Not to build and exec(3) through fork(2) \
 You could try to run as below
 
 ```
-$ go run main.go --help
-Usage: /tmp/go-build3057508251/b001/exe/main [OPTION]... [FILE [PREFIX]]
+$ go run . --help
+Usage: /tmp/go-build321659200/b001/exe/GoSplit [OPTION]... [FILE [PREFIX]]
 Output pieces of FILE to PREFIXaa, PREFIXab, ...;
 default size is 1000 lines, and default PREFIX is 'x'.
 
