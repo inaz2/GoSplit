@@ -137,8 +137,8 @@ func splitByNumber(filePath string, prefix string, nNumber int) error {
 		}
 		// the last file size should be larger than or equal to chunkSize
 		if i < nNumber-1 {
-			written, err := io.CopyN(wFile, rFile, int64(chunkSize))
-			if written < int64(chunkSize) {
+			written, err := io.CopyN(wFile, rFile, chunkSize)
+			if written < chunkSize {
 				if written == 0 {
 					defer os.Remove(outFileName)
 				}
