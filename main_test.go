@@ -166,7 +166,7 @@ func TestSplitByNumberEmptyPrefix(t *testing.T) {
 	prefix := ""
 	nNumber := 4
 
-	err := splitByBytes(filePath, prefix, nNumber)
+	err := splitByNumber(filePath, prefix, nNumber)
 	if err == nil {
 		t.Errorf("empty prefix should be error")
 	}
@@ -177,7 +177,7 @@ func TestSplitByNumberInvalidNBytes(t *testing.T) {
 	prefix := "TestSplitByNumberInvalidNBytes-"
 	nNumber := 0
 
-	err := splitByBytes(filePath, prefix, nNumber)
+	err := splitByNumber(filePath, prefix, nNumber)
 	if err == nil {
 		t.Errorf("non-positive nNumber should be error")
 	}
