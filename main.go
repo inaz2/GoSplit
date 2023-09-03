@@ -241,21 +241,18 @@ With no FILE, or when FILE is -, read standard input.
 		fmt.Println("inaz2/GoSplit 1.0.0")
 		os.Exit(0)
 	case nLines > 0:
-		gosplit := GoSplit{filePath, prefix}
 		err := gosplit.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	case nNumber > 0:
-		gosplit := GoSplit{filePath, prefix}
 		err := gosplit.ByNumber(nNumber)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	case nBytes > 0:
-		gosplit := GoSplit{filePath, prefix}
 		err := gosplit.ByBytes(int64(nBytes))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
