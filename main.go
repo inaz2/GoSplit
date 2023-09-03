@@ -157,23 +157,23 @@ func (g GoSplit) ByNumber(nNumber int) error {
 	return nil
 }
 
-// splitByBytes splits the content of rFile by nBytes
-func splitByBytes(filePath string, prefix string, nBytes int64) error {
-	if prefix == "" {
+// ByBytes splits the content of rFile by nBytes
+func (g GoSplit) ByBytes(nBytes int64) error {
+	if g.prefix == "" {
 		return fmt.Errorf("PREFIX must not be empty string")
 	}
 	if nBytes <= 0 {
 		return fmt.Errorf("nBytes must be larger than zero")
 	}
 
-	rFile, err := openFileOrStdin(filePath)
+	rFile, err := openFileOrStdin(g.filePath)
 	if err != nil {
 		return fmt.Errorf("Failed to open: %w", err)
 	}
 	defer rFile.Close()
 
 	for i := 0; ; i++ {
-		outFileName, err := generateOutFileName(prefix, i)
+		outFileName, err := generateOutFileName(g.prefix, i)
 		if err != nil {
 			return fmt.Errorf("Failed to generate file name: %w", err)
 		}
@@ -255,7 +255,8 @@ With no FILE, or when FILE is -, read standard input.
 			os.Exit(1)
 		}
 	case nBytes > 0:
-		err := splitByBytes(filePath, prefix, int64(nBytes))
+		gosplit := GoSplit{filePath, prefix}
+		err := gosplit.ByBytes(int64(nBytes))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
