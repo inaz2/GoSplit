@@ -152,7 +152,7 @@ func splitByNumber(filePath string, prefix string, nNumber int) error {
 }
 
 // splitByBytes splits the content of rFile by nBytes
-func splitByBytes(filePath string, prefix string, nBytes int) error {
+func splitByBytes(filePath string, prefix string, nBytes int64) error {
 	if prefix == "" {
 		return fmt.Errorf("PREFIX must not be empty string")
 	}
@@ -175,8 +175,8 @@ func splitByBytes(filePath string, prefix string, nBytes int) error {
 		if err != nil {
 			return fmt.Errorf("Failed to create: %w", err)
 		}
-		written, err := io.CopyN(wFile, rFile, int64(nBytes))
-		if written < int64(nBytes) {
+		written, err := io.CopyN(wFile, rFile, nBytes)
+		if written < nBytes {
 			if written == 0 {
 				defer os.Remove(outFileName)
 			}
@@ -245,7 +245,7 @@ With no FILE, or when FILE is -, read standard input.
 			os.Exit(1)
 		}
 	case nBytes > 0:
-		err := splitByBytes(filePath, prefix, nBytes)
+		err := splitByBytes(filePath, prefix, int64(nBytes))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

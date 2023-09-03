@@ -186,7 +186,7 @@ func TestSplitByNumberInvalidNBytes(t *testing.T) {
 func TestSplitByBytes(t *testing.T) {
 	filePath := "testdata/example.txt"
 	prefix := "TestSplitByBytes-"
-	nBytes := 512
+	nBytes := int64(512)
 	outFiles := []struct {
 		name   string
 		nBytes int64
@@ -216,7 +216,7 @@ func TestSplitByBytes(t *testing.T) {
 func TestSplitByBytesEmpty(t *testing.T) {
 	filePath := "testdata/empty"
 	prefix := "TestSplitByBytesEmpty-"
-	nBytes := 512
+	nBytes := int64(512)
 
 	err := splitByBytes(filePath, prefix, nBytes)
 	if err != nil {
@@ -233,7 +233,7 @@ func TestSplitByBytesEmpty(t *testing.T) {
 func TestSplitByBytesEmptyPrefix(t *testing.T) {
 	filePath := "testdata/example.txt"
 	prefix := ""
-	nBytes := 512
+	nBytes := int64(512)
 
 	err := splitByBytes(filePath, prefix, nBytes)
 	if err == nil {
@@ -244,7 +244,7 @@ func TestSplitByBytesEmptyPrefix(t *testing.T) {
 func TestSplitByBytesInvalidNBytes(t *testing.T) {
 	filePath := "testdata/example.txt"
 	prefix := "TestSplitByBytesInvalidNBytes-"
-	nBytes := 0
+	nBytes := int64(0)
 
 	err := splitByBytes(filePath, prefix, nBytes)
 	if err == nil {
