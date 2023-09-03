@@ -11,7 +11,7 @@ var (
 	bVersion bool
 	nLines   int
 	nNumber  int
-	nBytes   int
+	nBytes   int64
 )
 
 func init() {
@@ -19,7 +19,7 @@ func init() {
 	flag.BoolVar(&bVersion, "version", false, "output version information and exit")
 	flag.IntVar(&nLines, "l", 0, "put NUMBER lines/records per output file")
 	flag.IntVar(&nNumber, "n", 0, "split into N files based on size of input")
-	flag.IntVar(&nBytes, "b", 0, "put SIZE bytes per output file")
+	flag.Int64Var(&nBytes, "b", 0, "put SIZE bytes per output file")
 }
 
 func main() {
@@ -71,7 +71,7 @@ With no FILE, or when FILE is -, read standard input.
 			os.Exit(1)
 		}
 	case nBytes > 0:
-		err := gosplit.ByBytes(int64(nBytes))
+		err := gosplit.ByBytes(nBytes)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
