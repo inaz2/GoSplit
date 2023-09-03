@@ -118,7 +118,7 @@ func splitByNumber(filePath string, prefix string, nNumber int) error {
 	if fileSize == 0 {
 		return nil
 	}
-	chunkSize := int(float64(fileSize) / float64(nNumber))
+	chunkSize := fileSize / int64(nNumber)
 
 	for i := 0; i < nNumber; i++ {
 		outFileName, err := generateOutFileName(prefix, i)
