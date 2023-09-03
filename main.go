@@ -96,21 +96,21 @@ OuterLoop:
 	return nil
 }
 
-// splitByNumber splits the content of rFile into nNumber files
-func splitByNumber(filePath string, prefix string, nNumber int) error {
+// ByNumber splits the content of rFile into nNumber files
+func (g GoSplit) ByNumber(nNumber int) error {
 	// print error message when filePath is stdin
-	if filePath == "-" {
+	if g.filePath == "-" {
 		return fmt.Errorf("cannot determine file size")
 	}
 
-	if prefix == "" {
+	if g.prefix == "" {
 		return fmt.Errorf("PREFIX must not be empty string")
 	}
 	if nNumber <= 0 {
 		return fmt.Errorf("nNumber must be larger than zero")
 	}
 
-	rFile, err := os.Open(filePath)
+	rFile, err := os.Open(g.filePath)
 	if err != nil {
 		return fmt.Errorf("Failed to open: %w", err)
 	}
@@ -127,7 +127,7 @@ func splitByNumber(filePath string, prefix string, nNumber int) error {
 	chunkSize := fileSize / int64(nNumber)
 
 	for i := 0; i < nNumber; i++ {
-		outFileName, err := generateOutFileName(prefix, i)
+		outFileName, err := generateOutFileName(g.prefix, i)
 		if err != nil {
 			return fmt.Errorf("Failed to generate file name: %w", err)
 		}
@@ -248,7 +248,8 @@ With no FILE, or when FILE is -, read standard input.
 			os.Exit(1)
 		}
 	case nNumber > 0:
-		err := splitByNumber(filePath, prefix, nNumber)
+		gosplit := GoSplit{filePath, prefix}
+		err := gosplit.ByNumber(nNumber)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
