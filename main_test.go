@@ -31,22 +31,23 @@ func countBytes(filePath string) (int64, error) {
 	return fileSize, nil
 }
 
-func TestSplitByLines(t *testing.T) {
+func TestGoSplitByLines(t *testing.T) {
 	filePath := "testdata/example.txt"
-	prefix := "TestSplitByLines-"
+	prefix := "TestGoSplitByLines-"
 	nLines := 10
 	outFiles := []struct {
 		name   string
 		nLines int
 	}{
-		{"TestSplitByLines-aa", 10},
-		{"TestSplitByLines-ab", 10},
-		{"TestSplitByLines-ac", 10},
-		{"TestSplitByLines-ad", 10},
-		{"TestSplitByLines-ae", 2},
+		{"TestGoSplitByLines-aa", 10},
+		{"TestGoSplitByLines-ab", 10},
+		{"TestGoSplitByLines-ac", 10},
+		{"TestGoSplitByLines-ad", 10},
+		{"TestGoSplitByLines-ae", 2},
 	}
 
-	err := splitByLines(filePath, prefix, nLines)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByLines(nLines)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,40 +64,43 @@ func TestSplitByLines(t *testing.T) {
 	}
 }
 
-func TestSplitByLinesEmpty(t *testing.T) {
+func TestGoSplitByLinesEmpty(t *testing.T) {
 	filePath := "testdata/empty"
-	prefix := "TestSplitByLinesEmpty-"
+	prefix := "TestGoSplitByLinesEmpty-"
 	nLines := 10
 
-	err := splitByLines(filePath, prefix, nLines)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByLines(nLines)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	fileName := "TestSplitByLinesEmpty-aa"
+	fileName := "TestGoSplitByLinesEmpty-aa"
 	_, err = os.Stat(fileName)
 	if err == nil {
 		t.Errorf("os.Stat(%#v) should be error", fileName)
 	}
 }
 
-func TestSplitByLinesEmptyPrefix(t *testing.T) {
+func TestGoSplitByLinesEmptyPrefix(t *testing.T) {
 	filePath := "testdata/example.txt"
 	prefix := ""
 	nLines := 10
 
-	err := splitByLines(filePath, prefix, nLines)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByLines(nLines)
 	if err == nil {
 		t.Errorf("empty prefix should be error")
 	}
 }
 
-func TestSplitByLinesInvalidNLines(t *testing.T) {
+func TestGoSplitByLinesInvalidNLines(t *testing.T) {
 	filePath := "testdata/example.txt"
-	prefix := "TestSplitByLinesInvalidNLines-"
+	prefix := "TestGoSplitByLinesInvalidNLines-"
 	nLines := 0
 
-	err := splitByLines(filePath, prefix, nLines)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByLines(nLines)
 	if err == nil {
 		t.Errorf("non-positive nLines should be error")
 	}

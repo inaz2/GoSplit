@@ -45,16 +45,22 @@ func openFileOrStdin(filePath string) (*os.File, error) {
 	}
 }
 
-// splitByLines splits the content of rFile by nLines
-func splitByLines(filePath string, prefix string, nLines int) error {
-	if prefix == "" {
+// GoSplit holds filePath and prefix
+type GoSplit struct {
+	filePath string
+	prefix string
+}
+
+// ByLines splits the content of rFile by nLines
+func (g GoSplit) ByLines(nLines int) error {
+	if g.prefix == "" {
 		return fmt.Errorf("PREFIX must not be empty string")
 	}
 	if nLines <= 0 {
 		return fmt.Errorf("nLines must be larger than zero")
 	}
 
-	rFile, err := openFileOrStdin(filePath)
+	rFile, err := openFileOrStdin(g.filePath)
 	if err != nil {
 		return fmt.Errorf("Failed to open: %w", err)
 	}
@@ -64,7 +70,7 @@ func splitByLines(filePath string, prefix string, nLines int) error {
 
 OuterLoop:
 	for i := 0; ; i++ {
-		outFileName, err := generateOutFileName(prefix, i)
+		outFileName, err := generateOutFileName(g.prefix, i)
 		if err != nil {
 			return fmt.Errorf("Failed to generate file name: %w", err)
 		}
@@ -218,6 +224,8 @@ func main() {
 		prefix = flag.Args()[1]
 	}
 
+	gosplit := GoSplit{filePath, prefix}
+
 	switch {
 	case bHelp:
 		usageFormat := `Usage: %s [OPTION]... [FILE [PREFIX]]
@@ -233,7 +241,8 @@ With no FILE, or when FILE is -, read standard input.
 		fmt.Println("inaz2/GoSplit 1.0.0")
 		os.Exit(0)
 	case nLines > 0:
-		err := splitByLines(filePath, prefix, nLines)
+		gosplit := GoSplit{filePath, prefix}
+		err := gosplit.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -252,7 +261,7 @@ With no FILE, or when FILE is -, read standard input.
 		}
 	default:
 		nLines = 1000
-		err := splitByLines(filePath, prefix, nLines)
+		err := gosplit.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
