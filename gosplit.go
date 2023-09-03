@@ -39,7 +39,7 @@ func openFileOrStdin(filePath string) (*os.File, error) {
 // GoSplit holds filePath and prefix
 type GoSplit struct {
 	filePath string
-	prefix string
+	prefix   string
 }
 
 // ByLines splits the content of rFile by nLines
