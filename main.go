@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
-	"io"
 	"os"
-	"strings"
 )
 
 var (
@@ -16,179 +13,6 @@ var (
 	nNumber  int
 	nBytes   int
 )
-
-// generateOutFileName returns n-th output file name with prefix
-//
-// only support 2-character suffix; aa , ab, ..., zz
-func generateOutFileName(prefix string, number int) (string, error) {
-	table := strings.Split("abcdefghijklmnopqrstuvwxyz", "")
-	if number >= len(table)*len(table) {
-		return "", fmt.Errorf("output file suffixes exhausted")
-	}
-
-	n0 := number % len(table)
-	number = number / len(table)
-	n1 := number % len(table)
-	suffix := table[n1] + table[n0]
-
-	outFileName := prefix + suffix
-	return outFileName, nil
-}
-
-// openFileOrStdin opens filePath or returns os.Stdin
-func openFileOrStdin(filePath string) (*os.File, error) {
-	if filePath == "-" {
-		return os.Stdin, nil
-	} else {
-		rFile, err := os.Open(filePath)
-		return rFile, err
-	}
-}
-
-// splitByLines splits the content of rFile by nLines
-func splitByLines(filePath string, prefix string, nLines int) error {
-	if prefix == "" {
-		return fmt.Errorf("PREFIX must not be empty string")
-	}
-	if nLines <= 0 {
-		return fmt.Errorf("nLines must be larger than zero")
-	}
-
-	rFile, err := openFileOrStdin(filePath)
-	if err != nil {
-		return fmt.Errorf("Failed to open: %w", err)
-	}
-	defer rFile.Close()
-
-	scanner := bufio.NewScanner(rFile)
-
-OuterLoop:
-	for i := 0; ; i++ {
-		outFileName, err := generateOutFileName(prefix, i)
-		if err != nil {
-			return fmt.Errorf("Failed to generate file name: %w", err)
-		}
-		wFile, err := os.Create(outFileName)
-		if err != nil {
-			return fmt.Errorf("Failed to create: %w", err)
-		}
-		for j := 0; j < nLines; j++ {
-			if !scanner.Scan() {
-				if j == 0 {
-					defer os.Remove(outFileName)
-				}
-				break OuterLoop
-			}
-			fmt.Fprintln(wFile, scanner.Text())
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("Failed to read: %w", err)
-	}
-
-	return nil
-}
-
-// splitByNumber splits the content of rFile into nNumber files
-func splitByNumber(filePath string, prefix string, nNumber int) error {
-	// print error message when filePath is stdin
-	if filePath == "-" {
-		return fmt.Errorf("cannot determine file size")
-	}
-
-	if prefix == "" {
-		return fmt.Errorf("PREFIX must not be empty string")
-	}
-	if nNumber <= 0 {
-		return fmt.Errorf("nNumber must be larger than zero")
-	}
-
-	rFile, err := os.Open(filePath)
-	if err != nil {
-		return fmt.Errorf("Failed to open: %w", err)
-	}
-	defer rFile.Close()
-
-	fileInfo, err := rFile.Stat()
-	if err != nil {
-		return fmt.Errorf("Failed to stat: %w", err)
-	}
-	fileSize := fileInfo.Size()
-	if fileSize == 0 {
-		return nil
-	}
-	chunkSize := fileSize / int64(nNumber)
-
-	for i := 0; i < nNumber; i++ {
-		outFileName, err := generateOutFileName(prefix, i)
-		if err != nil {
-			return fmt.Errorf("Failed to generate file name: %w", err)
-		}
-		wFile, err := os.Create(outFileName)
-		if err != nil {
-			return fmt.Errorf("Failed to create: %w", err)
-		}
-		// the last file size should be larger than or equal to chunkSize
-		if i < nNumber-1 {
-			written, err := io.CopyN(wFile, rFile, int64(chunkSize))
-			if written < int64(chunkSize) {
-				if written == 0 {
-					defer os.Remove(outFileName)
-				}
-				break
-			}
-			if err != nil {
-				return fmt.Errorf("Failed to write: %w", err)
-			}
-		} else {
-			if _, err := io.Copy(wFile, rFile); err != nil {
-				return fmt.Errorf("Failed to write: %w", err)
-			}
-		}
-	}
-
-	return nil
-}
-
-// splitByBytes splits the content of rFile by nBytes
-func splitByBytes(filePath string, prefix string, nBytes int64) error {
-	if prefix == "" {
-		return fmt.Errorf("PREFIX must not be empty string")
-	}
-	if nBytes <= 0 {
-		return fmt.Errorf("nBytes must be larger than zero")
-	}
-
-	rFile, err := openFileOrStdin(filePath)
-	if err != nil {
-		return fmt.Errorf("Failed to open: %w", err)
-	}
-	defer rFile.Close()
-
-	for i := 0; ; i++ {
-		outFileName, err := generateOutFileName(prefix, i)
-		if err != nil {
-			return fmt.Errorf("Failed to generate file name: %w", err)
-		}
-		wFile, err := os.Create(outFileName)
-		if err != nil {
-			return fmt.Errorf("Failed to create: %w", err)
-		}
-		written, err := io.CopyN(wFile, rFile, nBytes)
-		if written < nBytes {
-			if written == 0 {
-				defer os.Remove(outFileName)
-			}
-			break
-		}
-		if err != nil {
-			return fmt.Errorf("Failed to write: %w", err)
-		}
-	}
-
-	return nil
-}
 
 func init() {
 	flag.BoolVar(&bHelp, "help", false, "display this help and exit")
@@ -218,6 +42,8 @@ func main() {
 		prefix = flag.Args()[1]
 	}
 
+	gosplit := GoSplit{filePath, prefix}
+
 	switch {
 	case bHelp:
 		usageFormat := `Usage: %s [OPTION]... [FILE [PREFIX]]
@@ -233,26 +59,26 @@ With no FILE, or when FILE is -, read standard input.
 		fmt.Println("inaz2/GoSplit 1.0.0")
 		os.Exit(0)
 	case nLines > 0:
-		err := splitByLines(filePath, prefix, nLines)
+		err := gosplit.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	case nNumber > 0:
-		err := splitByNumber(filePath, prefix, nNumber)
+		err := gosplit.ByNumber(nNumber)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	case nBytes > 0:
-		err := splitByBytes(filePath, prefix, int64(nBytes))
+		err := gosplit.ByBytes(int64(nBytes))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	default:
 		nLines = 1000
-		err := splitByLines(filePath, prefix, nLines)
+		err := gosplit.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

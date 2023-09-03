@@ -31,22 +31,23 @@ func countBytes(filePath string) (int64, error) {
 	return fileSize, nil
 }
 
-func TestSplitByLines(t *testing.T) {
+func TestByLines(t *testing.T) {
 	filePath := "testdata/example.txt"
-	prefix := "TestSplitByLines-"
+	prefix := "TestByLines-"
 	nLines := 10
 	outFiles := []struct {
 		name   string
 		nLines int
 	}{
-		{"TestSplitByLines-aa", 10},
-		{"TestSplitByLines-ab", 10},
-		{"TestSplitByLines-ac", 10},
-		{"TestSplitByLines-ad", 10},
-		{"TestSplitByLines-ae", 2},
+		{"TestByLines-aa", 10},
+		{"TestByLines-ab", 10},
+		{"TestByLines-ac", 10},
+		{"TestByLines-ad", 10},
+		{"TestByLines-ae", 2},
 	}
 
-	err := splitByLines(filePath, prefix, nLines)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByLines(nLines)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,60 +64,64 @@ func TestSplitByLines(t *testing.T) {
 	}
 }
 
-func TestSplitByLinesEmpty(t *testing.T) {
+func TestByLinesEmpty(t *testing.T) {
 	filePath := "testdata/empty"
-	prefix := "TestSplitByLinesEmpty-"
+	prefix := "TestByLinesEmpty-"
 	nLines := 10
 
-	err := splitByLines(filePath, prefix, nLines)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByLines(nLines)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	fileName := "TestSplitByLinesEmpty-aa"
+	fileName := "TestByLinesEmpty-aa"
 	_, err = os.Stat(fileName)
 	if err == nil {
 		t.Errorf("os.Stat(%#v) should be error", fileName)
 	}
 }
 
-func TestSplitByLinesEmptyPrefix(t *testing.T) {
+func TestByLinesEmptyPrefix(t *testing.T) {
 	filePath := "testdata/example.txt"
 	prefix := ""
 	nLines := 10
 
-	err := splitByLines(filePath, prefix, nLines)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByLines(nLines)
 	if err == nil {
 		t.Errorf("empty prefix should be error")
 	}
 }
 
-func TestSplitByLinesInvalidNLines(t *testing.T) {
+func TestByLinesInvalidNLines(t *testing.T) {
 	filePath := "testdata/example.txt"
-	prefix := "TestSplitByLinesInvalidNLines-"
+	prefix := "TestByLinesInvalidNLines-"
 	nLines := 0
 
-	err := splitByLines(filePath, prefix, nLines)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByLines(nLines)
 	if err == nil {
 		t.Errorf("non-positive nLines should be error")
 	}
 }
 
-func TestSplitByNumber(t *testing.T) {
+func TestByNumber(t *testing.T) {
 	filePath := "testdata/example.txt"
-	prefix := "TestSplitByNumber-"
+	prefix := "TestByNumber-"
 	nNumber := 4
 	outFiles := []struct {
 		name   string
 		nBytes int64
 	}{
-		{"TestSplitByNumber-aa", 363},
-		{"TestSplitByNumber-ab", 363},
-		{"TestSplitByNumber-ac", 363},
-		{"TestSplitByNumber-ad", 366},
+		{"TestByNumber-aa", 363},
+		{"TestByNumber-ab", 363},
+		{"TestByNumber-ac", 363},
+		{"TestByNumber-ad", 366},
 	}
 
-	err := splitByNumber(filePath, prefix, nNumber)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByNumber(nNumber)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -133,70 +138,75 @@ func TestSplitByNumber(t *testing.T) {
 	}
 }
 
-func TestSplitByNumberEmpty(t *testing.T) {
+func TestByNumberEmpty(t *testing.T) {
 	filePath := "testdata/empty"
-	prefix := "TestSplitByNumberEmpty-"
+	prefix := "TestByNumberEmpty-"
 	nNumber := 4
 
-	err := splitByNumber(filePath, prefix, nNumber)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByNumber(nNumber)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	fileName := "TestSplitByNumberEmpty-aa"
+	fileName := "TestByNumberEmpty-aa"
 	_, err = os.Stat(fileName)
 	if err == nil {
 		t.Errorf("os.Stat(%#v) should be error", fileName)
 	}
 }
 
-func TestSplitByNumberStdin(t *testing.T) {
+func TestByNumberStdin(t *testing.T) {
 	filePath := "-"
-	prefix := "TestSplitByNumberEmpty-"
+	prefix := "TestByNumberEmpty-"
 	nNumber := 4
 
-	err := splitByNumber(filePath, prefix, nNumber)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByNumber(nNumber)
 	if err == nil {
-		t.Errorf("splitByNumber() with stdin should be error")
+		t.Errorf("ByNumber() with stdin should be error")
 	}
 }
 
-func TestSplitByNumberEmptyPrefix(t *testing.T) {
+func TestByNumberEmptyPrefix(t *testing.T) {
 	filePath := "testdata/example.txt"
 	prefix := ""
 	nNumber := 4
 
-	err := splitByNumber(filePath, prefix, nNumber)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByNumber(nNumber)
 	if err == nil {
 		t.Errorf("empty prefix should be error")
 	}
 }
 
-func TestSplitByNumberInvalidNBytes(t *testing.T) {
+func TestByNumberInvalidNBytes(t *testing.T) {
 	filePath := "testdata/example.txt"
-	prefix := "TestSplitByNumberInvalidNBytes-"
+	prefix := "TestByNumberInvalidNBytes-"
 	nNumber := 0
 
-	err := splitByNumber(filePath, prefix, nNumber)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByNumber(nNumber)
 	if err == nil {
 		t.Errorf("non-positive nNumber should be error")
 	}
 }
 
-func TestSplitByBytes(t *testing.T) {
+func TestByBytes(t *testing.T) {
 	filePath := "testdata/example.txt"
-	prefix := "TestSplitByBytes-"
+	prefix := "TestByBytes-"
 	nBytes := int64(512)
 	outFiles := []struct {
 		name   string
 		nBytes int64
 	}{
-		{"TestSplitByBytes-aa", 512},
-		{"TestSplitByBytes-ab", 512},
-		{"TestSplitByBytes-ac", 431},
+		{"TestByBytes-aa", 512},
+		{"TestByBytes-ab", 512},
+		{"TestByBytes-ac", 431},
 	}
 
-	err := splitByBytes(filePath, prefix, nBytes)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByBytes(nBytes)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -213,40 +223,43 @@ func TestSplitByBytes(t *testing.T) {
 	}
 }
 
-func TestSplitByBytesEmpty(t *testing.T) {
+func TestByBytesEmpty(t *testing.T) {
 	filePath := "testdata/empty"
-	prefix := "TestSplitByBytesEmpty-"
+	prefix := "TestByBytesEmpty-"
 	nBytes := int64(512)
 
-	err := splitByBytes(filePath, prefix, nBytes)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByBytes(nBytes)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	fileName := "TestSplitByBytesEmpty-aa"
+	fileName := "TestByBytesEmpty-aa"
 	_, err = os.Stat(fileName)
 	if err == nil {
 		t.Errorf("os.Stat(%#v) should be error", fileName)
 	}
 }
 
-func TestSplitByBytesEmptyPrefix(t *testing.T) {
+func TestByBytesEmptyPrefix(t *testing.T) {
 	filePath := "testdata/example.txt"
 	prefix := ""
 	nBytes := int64(512)
 
-	err := splitByBytes(filePath, prefix, nBytes)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByBytes(nBytes)
 	if err == nil {
 		t.Errorf("empty prefix should be error")
 	}
 }
 
-func TestSplitByBytesInvalidNBytes(t *testing.T) {
+func TestByBytesInvalidNBytes(t *testing.T) {
 	filePath := "testdata/example.txt"
-	prefix := "TestSplitByBytesInvalidNBytes-"
+	prefix := "TestByBytesInvalidNBytes-"
 	nBytes := int64(0)
 
-	err := splitByBytes(filePath, prefix, nBytes)
+	gosplit := GoSplit{filePath, prefix}
+	err := gosplit.ByBytes(nBytes)
 	if err == nil {
 		t.Errorf("non-positive nBytes should be error")
 	}
