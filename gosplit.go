@@ -8,10 +8,24 @@ import (
 	"strings"
 )
 
+// GoSplit represents filePath and prefix
+type GoSplit struct {
+	filePath string
+	prefix   string
+}
+
+// NewGoSplit returns a new GoSplit struct
+func NewGoSplit(filePath string, prefix string) *GoSplit {
+	return &GoSplit{
+		filePath: filePath,
+		prefix:   prefix,
+	}
+}
+
 // generateOutFileName returns n-th output file name with prefix
 //
 // only support 2-character suffix; aa , ab, ..., zz
-func generateOutFileName(prefix string, number int) (string, error) {
+func (g *GoSplit) generateOutFileName(number int) (string, error) {
 	table := strings.Split("abcdefghijklmnopqrstuvwxyz", "")
 	if number >= len(table)*len(table) {
 		return "", fmt.Errorf("output file suffixes exhausted")
@@ -22,28 +36,22 @@ func generateOutFileName(prefix string, number int) (string, error) {
 	n1 := number % len(table)
 	suffix := table[n1] + table[n0]
 
-	outFileName := prefix + suffix
+	outFileName := g.prefix + suffix
 	return outFileName, nil
 }
 
 // openFileOrStdin opens filePath or returns os.Stdin
-func openFileOrStdin(filePath string) (*os.File, error) {
-	if filePath == "-" {
+func (g *GoSplit) openFileOrStdin() (*os.File, error) {
+	if g.filePath == "-" {
 		return os.Stdin, nil
 	} else {
-		rFile, err := os.Open(filePath)
+		rFile, err := os.Open(g.filePath)
 		return rFile, err
 	}
 }
 
-// GoSplit holds filePath and prefix
-type GoSplit struct {
-	filePath string
-	prefix   string
-}
-
-// ByLines splits the content of rFile by nLines
-func (g GoSplit) ByLines(nLines int) error {
+// ByLines splits the content of filePath by nLines
+func (g *GoSplit) ByLines(nLines int) error {
 	if g.prefix == "" {
 		return fmt.Errorf("PREFIX must not be empty string")
 	}
@@ -51,7 +59,7 @@ func (g GoSplit) ByLines(nLines int) error {
 		return fmt.Errorf("nLines must be larger than zero")
 	}
 
-	rFile, err := openFileOrStdin(g.filePath)
+	rFile, err := g.openFileOrStdin()
 	if err != nil {
 		return fmt.Errorf("Failed to open: %w", err)
 	}
@@ -61,7 +69,7 @@ func (g GoSplit) ByLines(nLines int) error {
 
 OuterLoop:
 	for i := 0; ; i++ {
-		outFileName, err := generateOutFileName(g.prefix, i)
+		outFileName, err := g.generateOutFileName(i)
 		if err != nil {
 			return fmt.Errorf("Failed to generate file name: %w", err)
 		}
@@ -87,8 +95,8 @@ OuterLoop:
 	return nil
 }
 
-// ByNumber splits the content of rFile into nNumber files
-func (g GoSplit) ByNumber(nNumber int) error {
+// ByNumber splits the content of filePath into nNumber files
+func (g *GoSplit) ByNumber(nNumber int) error {
 	// print error message when filePath is stdin
 	if g.filePath == "-" {
 		return fmt.Errorf("cannot determine file size")
@@ -118,7 +126,7 @@ func (g GoSplit) ByNumber(nNumber int) error {
 	chunkSize := fileSize / int64(nNumber)
 
 	for i := 0; i < nNumber; i++ {
-		outFileName, err := generateOutFileName(g.prefix, i)
+		outFileName, err := g.generateOutFileName(i)
 		if err != nil {
 			return fmt.Errorf("Failed to generate file name: %w", err)
 		}
@@ -148,8 +156,8 @@ func (g GoSplit) ByNumber(nNumber int) error {
 	return nil
 }
 
-// ByBytes splits the content of rFile by nBytes
-func (g GoSplit) ByBytes(nBytes int64) error {
+// ByBytes splits the content of filePath by nBytes
+func (g *GoSplit) ByBytes(nBytes int64) error {
 	if g.prefix == "" {
 		return fmt.Errorf("PREFIX must not be empty string")
 	}
@@ -157,14 +165,14 @@ func (g GoSplit) ByBytes(nBytes int64) error {
 		return fmt.Errorf("nBytes must be larger than zero")
 	}
 
-	rFile, err := openFileOrStdin(g.filePath)
+	rFile, err := g.openFileOrStdin()
 	if err != nil {
 		return fmt.Errorf("Failed to open: %w", err)
 	}
 	defer rFile.Close()
 
 	for i := 0; ; i++ {
-		outFileName, err := generateOutFileName(g.prefix, i)
+		outFileName, err := g.generateOutFileName(i)
 		if err != nil {
 			return fmt.Errorf("Failed to generate file name: %w", err)
 		}

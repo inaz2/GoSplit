@@ -42,8 +42,6 @@ func main() {
 		prefix = flag.Args()[1]
 	}
 
-	gosplit := GoSplit{filePath, prefix}
-
 	switch {
 	case bHelp:
 		usageFormat := `Usage: %s [OPTION]... [FILE [PREFIX]]
@@ -59,26 +57,30 @@ With no FILE, or when FILE is -, read standard input.
 		fmt.Println("inaz2/GoSplit 1.0.0")
 		os.Exit(0)
 	case nLines > 0:
-		err := gosplit.ByLines(nLines)
+		goSplit := NewGoSplit(filePath, prefix)
+		err := goSplit.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	case nNumber > 0:
-		err := gosplit.ByNumber(nNumber)
+		goSplit := NewGoSplit(filePath, prefix)
+		err := goSplit.ByNumber(nNumber)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	case nBytes > 0:
-		err := gosplit.ByBytes(nBytes)
+		goSplit := NewGoSplit(filePath, prefix)
+		err := goSplit.ByBytes(nBytes)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	default:
 		nLines = 1000
-		err := gosplit.ByLines(nLines)
+		goSplit := NewGoSplit(filePath, prefix)
+		err := goSplit.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
