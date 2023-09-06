@@ -8,14 +8,18 @@ import (
 	"strings"
 )
 
-// GoSplit holds filePath and prefix
+// GoSplit represents filePath and prefix
 type GoSplit struct {
 	filePath string
 	prefix   string
 }
 
+// NewGoSplit returns a new GoSplit struct
 func NewGoSplit(filePath string, prefix string) *GoSplit {
-	return &GoSplit{filePath, prefix}
+	return &GoSplit{
+		filePath: filePath,
+		prefix:   prefix,
+	}
 }
 
 // generateOutFileName returns n-th output file name with prefix
@@ -46,7 +50,7 @@ func (g *GoSplit) openFileOrStdin() (*os.File, error) {
 	}
 }
 
-// ByLines splits the content of rFile by nLines
+// ByLines splits the content of filePath by nLines
 func (g *GoSplit) ByLines(nLines int) error {
 	if g.prefix == "" {
 		return fmt.Errorf("PREFIX must not be empty string")
@@ -91,7 +95,7 @@ OuterLoop:
 	return nil
 }
 
-// ByNumber splits the content of rFile into nNumber files
+// ByNumber splits the content of filePath into nNumber files
 func (g *GoSplit) ByNumber(nNumber int) error {
 	// print error message when filePath is stdin
 	if g.filePath == "-" {
@@ -152,7 +156,7 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 	return nil
 }
 
-// ByBytes splits the content of rFile by nBytes
+// ByBytes splits the content of filePath by nBytes
 func (g *GoSplit) ByBytes(nBytes int64) error {
 	if g.prefix == "" {
 		return fmt.Errorf("PREFIX must not be empty string")
