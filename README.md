@@ -75,7 +75,7 @@ With no FILE, or when FILE is -, read standard input.
 ## Testing
 
 ```
-$ go test -v
+$ go test -v ./...
 ```
 
 * Test methods were created for each purpose for each option.
