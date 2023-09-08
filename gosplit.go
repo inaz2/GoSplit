@@ -53,7 +53,7 @@ func (g *GoSplit) openFileOrStdin() (*os.File, error) {
 // ByLines splits the content of filePath by nLines
 func (g *GoSplit) ByLines(nLines int) error {
 	if g.prefix == "" {
-		return fmt.Errorf("PREFIX must not be empty string")
+		return fmt.Errorf("prefix must not be empty string")
 	}
 	if nLines <= 0 {
 		return fmt.Errorf("nLines must be larger than zero")
@@ -61,7 +61,7 @@ func (g *GoSplit) ByLines(nLines int) error {
 
 	rFile, err := g.openFileOrStdin()
 	if err != nil {
-		return fmt.Errorf("Failed to open: %w", err)
+		return fmt.Errorf("failed to open: %w", err)
 	}
 	defer rFile.Close()
 
@@ -71,11 +71,11 @@ OuterLoop:
 	for i := 0; ; i++ {
 		outFileName, err := g.generateOutFileName(i)
 		if err != nil {
-			return fmt.Errorf("Failed to generate file name: %w", err)
+			return fmt.Errorf("failed to generate file name: %w", err)
 		}
 		wFile, err := os.Create(outFileName)
 		if err != nil {
-			return fmt.Errorf("Failed to create: %w", err)
+			return fmt.Errorf("failed to create: %w", err)
 		}
 		for j := 0; j < nLines; j++ {
 			if !scanner.Scan() {
@@ -89,7 +89,7 @@ OuterLoop:
 	}
 
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("Failed to read: %w", err)
+		return fmt.Errorf("failed to read: %w", err)
 	}
 
 	return nil
@@ -103,7 +103,7 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 	}
 
 	if g.prefix == "" {
-		return fmt.Errorf("PREFIX must not be empty string")
+		return fmt.Errorf("prefix must not be empty string")
 	}
 	if nNumber <= 0 {
 		return fmt.Errorf("nNumber must be larger than zero")
@@ -111,13 +111,13 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 
 	rFile, err := os.Open(g.filePath)
 	if err != nil {
-		return fmt.Errorf("Failed to open: %w", err)
+		return fmt.Errorf("failed to open: %w", err)
 	}
 	defer rFile.Close()
 
 	fileInfo, err := rFile.Stat()
 	if err != nil {
-		return fmt.Errorf("Failed to stat: %w", err)
+		return fmt.Errorf("failed to stat: %w", err)
 	}
 	fileSize := fileInfo.Size()
 	if fileSize == 0 {
@@ -128,11 +128,11 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 	for i := 0; i < nNumber; i++ {
 		outFileName, err := g.generateOutFileName(i)
 		if err != nil {
-			return fmt.Errorf("Failed to generate file name: %w", err)
+			return fmt.Errorf("failed to generate file name: %w", err)
 		}
 		wFile, err := os.Create(outFileName)
 		if err != nil {
-			return fmt.Errorf("Failed to create: %w", err)
+			return fmt.Errorf("failed to create: %w", err)
 		}
 		// the last file size should be larger than or equal to chunkSize
 		if i < nNumber-1 {
@@ -144,11 +144,11 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 				break
 			}
 			if err != nil {
-				return fmt.Errorf("Failed to write: %w", err)
+				return fmt.Errorf("failed to write: %w", err)
 			}
 		} else {
 			if _, err := io.Copy(wFile, rFile); err != nil {
-				return fmt.Errorf("Failed to write: %w", err)
+				return fmt.Errorf("failed to write: %w", err)
 			}
 		}
 	}
@@ -159,7 +159,7 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 // ByBytes splits the content of filePath by nBytes
 func (g *GoSplit) ByBytes(nBytes int64) error {
 	if g.prefix == "" {
-		return fmt.Errorf("PREFIX must not be empty string")
+		return fmt.Errorf("prefix must not be empty string")
 	}
 	if nBytes <= 0 {
 		return fmt.Errorf("nBytes must be larger than zero")
@@ -167,18 +167,18 @@ func (g *GoSplit) ByBytes(nBytes int64) error {
 
 	rFile, err := g.openFileOrStdin()
 	if err != nil {
-		return fmt.Errorf("Failed to open: %w", err)
+		return fmt.Errorf("failed to open: %w", err)
 	}
 	defer rFile.Close()
 
 	for i := 0; ; i++ {
 		outFileName, err := g.generateOutFileName(i)
 		if err != nil {
-			return fmt.Errorf("Failed to generate file name: %w", err)
+			return fmt.Errorf("failed to generate file name: %w", err)
 		}
 		wFile, err := os.Create(outFileName)
 		if err != nil {
-			return fmt.Errorf("Failed to create: %w", err)
+			return fmt.Errorf("failed to create: %w", err)
 		}
 		written, err := io.CopyN(wFile, rFile, nBytes)
 		if written < nBytes {
@@ -188,7 +188,7 @@ func (g *GoSplit) ByBytes(nBytes int64) error {
 			break
 		}
 		if err != nil {
-			return fmt.Errorf("Failed to write: %w", err)
+			return fmt.Errorf("failed to write: %w", err)
 		}
 	}
 
