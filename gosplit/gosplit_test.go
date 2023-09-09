@@ -7,10 +7,12 @@ import (
 	"testing"
 )
 
-func countLines(filePath string) (int, error) {
+func helperCountLines(t *testing.T, filePath string) int {
+	t.Helper()
+
 	f, err := os.Open(filePath)
 	if err != nil {
-		return 0, err
+		t.Fatal("failed to open: %w", err)
 	}
 	defer f.Close()
 
@@ -19,17 +21,19 @@ func countLines(filePath string) (int, error) {
 	for scanner.Scan() {
 		nLines++
 	}
-	return nLines, nil
+	return nLines
 }
 
-func countBytes(filePath string) (int64, error) {
+func helperCountBytes(t *testing.T, filePath string) int64 {
+	t.Helper()
+
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
-		return 0, err
+		t.Fatal("failed to stat: %w", err)
 	}
 
 	fileSize := fileInfo.Size()
-	return fileSize, nil
+	return fileSize
 }
 
 func TestByLines(t *testing.T) {
@@ -50,16 +54,13 @@ func TestByLines(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix)
 	err := goSplit.ByLines(nLines)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("goSplit.ByLines() failed: %w", err)
 	}
 
 	for _, outFile := range outFiles {
-		result, err := countLines(outFile.name)
-		if err != nil {
-			t.Fatal(err)
-		}
+		result := helperCountLines(t, outFile.name)
 		if result != outFile.nLines {
-			t.Errorf("countLines(%#v) = %#v, want %#v", outFile.name, result, outFile.nLines)
+			t.Errorf("helperCountLines(%#v) = %#v, want %#v", outFile.name, result, outFile.nLines)
 		}
 		defer os.Remove(outFile.name)
 	}
@@ -73,7 +74,7 @@ func TestByLinesEmpty(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix)
 	err := goSplit.ByLines(nLines)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("goSplit.ByLines() failed: %w", err)
 	}
 
 	fileName := "TestByLinesEmpty-aa"
@@ -124,16 +125,13 @@ func TestByNumber(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix)
 	err := goSplit.ByNumber(nNumber)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("goSplit.ByNumber() failed: %w", err)
 	}
 
 	for _, outFile := range outFiles {
-		result, err := countBytes(outFile.name)
-		if err != nil {
-			t.Fatal(err)
-		}
+		result := helperCountBytes(t, outFile.name)
 		if result != outFile.nBytes {
-			t.Errorf("countBytes(%#v) = %#v, want %#v", outFile.name, result, outFile.nBytes)
+			t.Errorf("helperCountBytes(%#v) = %#v, want %#v", outFile.name, result, outFile.nBytes)
 		}
 		defer os.Remove(outFile.name)
 	}
@@ -147,7 +145,7 @@ func TestByNumberEmpty(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix)
 	err := goSplit.ByNumber(nNumber)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("goSplit.ByNumber() failed: %w", err)
 	}
 
 	fileName := "TestByNumberEmpty-aa"
@@ -209,16 +207,13 @@ func TestByBytes(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix)
 	err := goSplit.ByBytes(nBytes)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("goSplit.ByBytes() failed: %w", err)
 	}
 
 	for _, outFile := range outFiles {
-		result, err := countBytes(outFile.name)
-		if err != nil {
-			t.Fatal(err)
-		}
+		result := helperCountBytes(t, outFile.name)
 		if result != outFile.nBytes {
-			t.Errorf("countBytes(%#v) = %#v, want %#v", outFile.name, result, outFile.nBytes)
+			t.Errorf("helperCountBytes(%#v) = %#v, want %#v", outFile.name, result, outFile.nBytes)
 		}
 		defer os.Remove(outFile.name)
 	}
@@ -232,7 +227,7 @@ func TestByBytesEmpty(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix)
 	err := goSplit.ByBytes(nBytes)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("goSplit.ByBytes() failed: %w", err)
 	}
 
 	fileName := "TestByBytesEmpty-aa"
