@@ -37,6 +37,8 @@ func helperCountBytes(t *testing.T, filePath string) int64 {
 }
 
 func TestByLines(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/example.txt"
 	prefix := "TestByLines-"
 	nLines := 10
@@ -67,6 +69,8 @@ func TestByLines(t *testing.T) {
 }
 
 func TestByLinesEmpty(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/empty"
 	prefix := "TestByLinesEmpty-"
 	nLines := 10
@@ -85,6 +89,8 @@ func TestByLinesEmpty(t *testing.T) {
 }
 
 func TestByLinesEmptyPrefix(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/example.txt"
 	prefix := ""
 	nLines := 10
@@ -97,6 +103,8 @@ func TestByLinesEmptyPrefix(t *testing.T) {
 }
 
 func TestByLinesInvalidNLines(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/example.txt"
 	prefix := "TestByLinesInvalidNLines-"
 	nLines := 0
@@ -109,6 +117,8 @@ func TestByLinesInvalidNLines(t *testing.T) {
 }
 
 func TestByNumber(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/example.txt"
 	prefix := "TestByNumber-"
 	nNumber := 4
@@ -138,6 +148,8 @@ func TestByNumber(t *testing.T) {
 }
 
 func TestByNumberEmpty(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/empty"
 	prefix := "TestByNumberEmpty-"
 	nNumber := 4
@@ -156,6 +168,8 @@ func TestByNumberEmpty(t *testing.T) {
 }
 
 func TestByNumberStdin(t *testing.T) {
+	t.Parallel()
+
 	filePath := "-"
 	prefix := "TestByNumberEmpty-"
 	nNumber := 4
@@ -168,6 +182,8 @@ func TestByNumberStdin(t *testing.T) {
 }
 
 func TestByNumberEmptyPrefix(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/example.txt"
 	prefix := ""
 	nNumber := 4
@@ -180,6 +196,8 @@ func TestByNumberEmptyPrefix(t *testing.T) {
 }
 
 func TestByNumberInvalidNBytes(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/example.txt"
 	prefix := "TestByNumberInvalidNBytes-"
 	nNumber := 0
@@ -192,6 +210,8 @@ func TestByNumberInvalidNBytes(t *testing.T) {
 }
 
 func TestByBytes(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/example.txt"
 	prefix := "TestByBytes-"
 	nBytes := int64(512)
@@ -220,6 +240,8 @@ func TestByBytes(t *testing.T) {
 }
 
 func TestByBytesEmpty(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/empty"
 	prefix := "TestByBytesEmpty-"
 	nBytes := int64(512)
@@ -238,6 +260,8 @@ func TestByBytesEmpty(t *testing.T) {
 }
 
 func TestByBytesEmptyPrefix(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/example.txt"
 	prefix := ""
 	nBytes := int64(512)
@@ -250,6 +274,8 @@ func TestByBytesEmptyPrefix(t *testing.T) {
 }
 
 func TestByBytesInvalidNBytes(t *testing.T) {
+	t.Parallel()
+
 	filePath := "testdata/example.txt"
 	prefix := "TestByBytesInvalidNBytes-"
 	nBytes := int64(0)
