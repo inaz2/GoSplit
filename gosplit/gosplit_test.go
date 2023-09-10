@@ -13,7 +13,7 @@ func helperCountLines(t *testing.T, outDir string, filePath string) int {
 
 	f, err := os.Open(path.Join(outDir, filePath))
 	if err != nil {
-		t.Fatal("failed to open: %w", err)
+		t.Fatal("failed to open:", err)
 	}
 	defer f.Close()
 
@@ -30,7 +30,7 @@ func helperCountBytes(t *testing.T, outDir string, filePath string) int64 {
 
 	fileInfo, err := os.Stat(path.Join(outDir, filePath))
 	if err != nil {
-		t.Fatal("failed to stat: %w", err)
+		t.Fatal("failed to stat:", err)
 	}
 
 	fileSize := fileInfo.Size()
@@ -58,7 +58,7 @@ func TestByLines(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix, outDir)
 	err := goSplit.ByLines(nLines)
 	if err != nil {
-		t.Fatal("goSplit.ByLines() failed: %w", err)
+		t.Fatal("goSplit.ByLines() failed:", err)
 	}
 
 	for _, outFile := range outFiles {
@@ -80,7 +80,7 @@ func TestByLinesEmpty(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix, outDir)
 	err := goSplit.ByLines(nLines)
 	if err != nil {
-		t.Fatal("goSplit.ByLines() failed: %w", err)
+		t.Fatal("goSplit.ByLines() failed:", err)
 	}
 
 	fileName := "TestByLinesEmpty-aa"
@@ -140,7 +140,7 @@ func TestByNumber(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix, outDir)
 	err := goSplit.ByNumber(nNumber)
 	if err != nil {
-		t.Fatal("goSplit.ByNumber() failed: %w", err)
+		t.Fatal("goSplit.ByNumber() failed:", err)
 	}
 
 	for _, outFile := range outFiles {
@@ -162,7 +162,7 @@ func TestByNumberEmpty(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix, outDir)
 	err := goSplit.ByNumber(nNumber)
 	if err != nil {
-		t.Fatal("goSplit.ByNumber() failed: %w", err)
+		t.Fatal("goSplit.ByNumber() failed:", err)
 	}
 
 	fileName := "TestByNumberEmpty-aa"
@@ -236,7 +236,7 @@ func TestByBytes(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix, outDir)
 	err := goSplit.ByBytes(nBytes)
 	if err != nil {
-		t.Fatal("goSplit.ByBytes() failed: %w", err)
+		t.Fatal("goSplit.ByBytes() failed:", err)
 	}
 
 	for _, outFile := range outFiles {
@@ -258,7 +258,7 @@ func TestByBytesEmpty(t *testing.T) {
 	goSplit := NewGoSplit(filePath, prefix, outDir)
 	err := goSplit.ByBytes(nBytes)
 	if err != nil {
-		t.Fatal("goSplit.ByBytes() failed: %w", err)
+		t.Fatal("goSplit.ByBytes() failed:", err)
 	}
 
 	fileName := "TestByBytesEmpty-aa"
