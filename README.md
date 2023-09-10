@@ -10,8 +10,8 @@ To simplify implementation, the following behaviors are different to the origina
 Regarding SIZE specified with the -b option, unit specifications such as 1K and 1KiB are omitted, and only the number of bytes is specified.
 Regarding CHUNKS specified with the -n option, detailed specifications such as K/N and l/N are omitted, and only the number of output files N is specified.
 
-The suffix of the output file name has been fixed at two characters aa-zz, omitting the extension when the number increases.
-Therefore, the process ends with an error when the 676th output is executed.
+The suffix of the output file name is limited to two characters aa-zz, omitting the length extension when the number increases.
+Therefore, the process exits with an error after the 676th output.
 
 
 ## LICENSE
@@ -33,16 +33,16 @@ Therefore, the process ends with an error when the 676th output is executed.
 ## Supported irregular input
 
 * Standard input (including argument string "-")
-* input file of size 0
-* prefix string of length 0
-* Number of lines less than 0, number of output files, number of bytes
+* Input file of size 0
+* Prefix string of length 0
+* The number of lines, output files and bytes less than 1
 
 
 ## Performance notice
 
-* Read rows efficiently using bufio.Scanner()
-* Efficiently read and write files using io.CopyN()/io.Copy()
-* Obtained the file size in advance using (*os.File).Stat()
+* Read lines efficiently using bufio.Scanner()
+* Read and write files efficiently using io.CopyN()/io.Copy()
+* Obtain the file size in advance using (*os.File).Stat()
 
 
 ## Usage
@@ -78,6 +78,6 @@ With no FILE, or when FILE is -, read standard input.
 $ go test -v ./...
 ```
 
-* Test methods were created for each purpose for each option.
-* Define the expected output file name and its number of lines and bytes, and test that they all match.
-* Specify a prefix that corresponds to the test method name, and delete the output file at the end of the test.
+* Test methods is created for each purpose for each option.
+* Test that the pairs of each output file name and the number of lines/bytes matches.
+* Create output files in temporary directories, and remove at the end of the test.
