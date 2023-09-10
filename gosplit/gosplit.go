@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -12,20 +13,22 @@ import (
 type GoSplit struct {
 	filePath string
 	prefix   string
+	outDir   string
 }
 
 // NewGoSplit returns a new GoSplit struct
-func NewGoSplit(filePath string, prefix string) *GoSplit {
+func NewGoSplit(filePath string, prefix string, outDir string) *GoSplit {
 	return &GoSplit{
 		filePath: filePath,
 		prefix:   prefix,
+		outDir:   outDir,
 	}
 }
 
-// generateOutFileName returns n-th output file name with prefix
+// generateOutFilePath returns n-th output file name with prefix
 //
 // only support 2-character suffix; aa , ab, ..., zz
-func (g *GoSplit) generateOutFileName(number int) (string, error) {
+func (g *GoSplit) generateOutFilePath(number int) (string, error) {
 	table := strings.Split("abcdefghijklmnopqrstuvwxyz", "")
 	if number >= len(table)*len(table) {
 		return "", fmt.Errorf("output file suffixes exhausted")
@@ -37,7 +40,8 @@ func (g *GoSplit) generateOutFileName(number int) (string, error) {
 	suffix := table[n1] + table[n0]
 
 	outFileName := g.prefix + suffix
-	return outFileName, nil
+	outFilePath := path.Join(g.outDir, outFileName)
+	return outFilePath, nil
 }
 
 // openFileOrStdin opens filePath or returns os.Stdin
@@ -69,18 +73,18 @@ func (g *GoSplit) ByLines(nLines int) error {
 
 OuterLoop:
 	for i := 0; ; i++ {
-		outFileName, err := g.generateOutFileName(i)
+		outFilePath, err := g.generateOutFilePath(i)
 		if err != nil {
 			return fmt.Errorf("failed to generate file name: %w", err)
 		}
-		wFile, err := os.Create(outFileName)
+		wFile, err := os.Create(outFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to create: %w", err)
 		}
 		for j := 0; j < nLines; j++ {
 			if !scanner.Scan() {
 				if j == 0 {
-					defer os.Remove(outFileName)
+					defer os.Remove(outFilePath)
 				}
 				break OuterLoop
 			}
@@ -126,11 +130,11 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 	chunkSize := fileSize / int64(nNumber)
 
 	for i := 0; i < nNumber; i++ {
-		outFileName, err := g.generateOutFileName(i)
+		outFilePath, err := g.generateOutFilePath(i)
 		if err != nil {
 			return fmt.Errorf("failed to generate file name: %w", err)
 		}
-		wFile, err := os.Create(outFileName)
+		wFile, err := os.Create(outFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to create: %w", err)
 		}
@@ -139,7 +143,7 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 			written, err := io.CopyN(wFile, rFile, chunkSize)
 			if written < chunkSize {
 				if written == 0 {
-					defer os.Remove(outFileName)
+					defer os.Remove(outFilePath)
 				}
 				break
 			}
@@ -172,18 +176,18 @@ func (g *GoSplit) ByBytes(nBytes int64) error {
 	defer rFile.Close()
 
 	for i := 0; ; i++ {
-		outFileName, err := g.generateOutFileName(i)
+		outFilePath, err := g.generateOutFilePath(i)
 		if err != nil {
 			return fmt.Errorf("failed to generate file name: %w", err)
 		}
-		wFile, err := os.Create(outFileName)
+		wFile, err := os.Create(outFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to create: %w", err)
 		}
 		written, err := io.CopyN(wFile, rFile, nBytes)
 		if written < nBytes {
 			if written == 0 {
-				defer os.Remove(outFileName)
+				defer os.Remove(outFilePath)
 			}
 			break
 		}
