@@ -1,7 +1,7 @@
 package gosplit_test
 
 import (
-	. "inaz2/GoSplit/gosplit"
+	"inaz2/GoSplit/gosplit"
 	"flag"
 	"testing"
 
@@ -21,8 +21,8 @@ func testByLinesGoldenTarget(dir string) error {
 	prefix := "TestByLines-"
 	nLines := 10
 
-	goSplit := NewGoSplit(filePath, prefix, dir)
-	err := goSplit.ByLines(nLines)
+	g := gosplit.New(filePath, prefix, dir)
+	err := g.ByLines(nLines)
 	if err != nil {
 		return err
 	}
@@ -35,8 +35,8 @@ func testByNumberGoldenTarget(dir string) error {
 	prefix := "TestByNumber-"
 	nNumber := 4
 
-	goSplit := NewGoSplit(filePath, prefix, dir)
-	err := goSplit.ByNumber(nNumber)
+	g := gosplit.New(filePath, prefix, dir)
+	err := g.ByNumber(nNumber)
 	if err != nil {
 		return err
 	}
@@ -49,8 +49,8 @@ func testByBytesGoldenTarget(dir string) error {
 	prefix := "TestByBytes-"
 	nBytes := int64(512)
 
-	goSplit := NewGoSplit(filePath, prefix, dir)
-	err := goSplit.ByBytes(nBytes)
+	g := gosplit.New(filePath, prefix, dir)
+	err := g.ByBytes(nBytes)
 	if err != nil {
 		return err
 	}

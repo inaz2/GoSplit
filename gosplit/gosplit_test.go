@@ -1,7 +1,7 @@
 package gosplit_test
 
 import (
-	. "inaz2/GoSplit/gosplit"
+	"inaz2/GoSplit/gosplit"
 	"bufio"
 	"os"
 	"path"
@@ -55,10 +55,10 @@ func TestByLines(t *testing.T) {
 		{"TestByLines-ae", 2},
 	}
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByLines(nLines)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByLines(nLines)
 	if err != nil {
-		t.Fatal("goSplit.ByLines() failed:", err)
+		t.Fatal("ByLines() failed:", err)
 	}
 
 	for _, outFile := range outFiles {
@@ -77,10 +77,10 @@ func TestByLinesEmpty(t *testing.T) {
 	outDir := t.TempDir()
 	nLines := 10
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByLines(nLines)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByLines(nLines)
 	if err != nil {
-		t.Fatal("goSplit.ByLines() failed:", err)
+		t.Fatal("ByLines() failed:", err)
 	}
 
 	fileName := "TestByLinesEmpty-aa"
@@ -98,8 +98,8 @@ func TestByLinesEmptyPrefix(t *testing.T) {
 	outDir := t.TempDir()
 	nLines := 10
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByLines(nLines)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByLines(nLines)
 	if err == nil {
 		t.Errorf("empty prefix should be error")
 	}
@@ -113,8 +113,8 @@ func TestByLinesInvalidNLines(t *testing.T) {
 	outDir := t.TempDir()
 	nLines := 0
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByLines(nLines)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByLines(nLines)
 	if err == nil {
 		t.Errorf("non-positive nLines should be error")
 	}
@@ -137,10 +137,10 @@ func TestByNumber(t *testing.T) {
 		{"TestByNumber-ad", 366},
 	}
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByNumber(nNumber)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByNumber(nNumber)
 	if err != nil {
-		t.Fatal("goSplit.ByNumber() failed:", err)
+		t.Fatal("ByNumber() failed:", err)
 	}
 
 	for _, outFile := range outFiles {
@@ -159,10 +159,10 @@ func TestByNumberEmpty(t *testing.T) {
 	outDir := t.TempDir()
 	nNumber := 4
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByNumber(nNumber)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByNumber(nNumber)
 	if err != nil {
-		t.Fatal("goSplit.ByNumber() failed:", err)
+		t.Fatal("ByNumber() failed:", err)
 	}
 
 	fileName := "TestByNumberEmpty-aa"
@@ -180,8 +180,8 @@ func TestByNumberStdin(t *testing.T) {
 	outDir := t.TempDir()
 	nNumber := 4
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByNumber(nNumber)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByNumber(nNumber)
 	if err == nil {
 		t.Errorf("ByNumber() with stdin should be error")
 	}
@@ -195,8 +195,8 @@ func TestByNumberEmptyPrefix(t *testing.T) {
 	outDir := t.TempDir()
 	nNumber := 4
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByNumber(nNumber)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByNumber(nNumber)
 	if err == nil {
 		t.Errorf("empty prefix should be error")
 	}
@@ -210,8 +210,8 @@ func TestByNumberInvalidNBytes(t *testing.T) {
 	outDir := t.TempDir()
 	nNumber := 0
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByNumber(nNumber)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByNumber(nNumber)
 	if err == nil {
 		t.Errorf("non-positive nNumber should be error")
 	}
@@ -233,10 +233,10 @@ func TestByBytes(t *testing.T) {
 		{"TestByBytes-ac", 431},
 	}
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByBytes(nBytes)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByBytes(nBytes)
 	if err != nil {
-		t.Fatal("goSplit.ByBytes() failed:", err)
+		t.Fatal("ByBytes() failed:", err)
 	}
 
 	for _, outFile := range outFiles {
@@ -255,10 +255,10 @@ func TestByBytesEmpty(t *testing.T) {
 	outDir := t.TempDir()
 	nBytes := int64(512)
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByBytes(nBytes)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByBytes(nBytes)
 	if err != nil {
-		t.Fatal("goSplit.ByBytes() failed:", err)
+		t.Fatal("ByBytes() failed:", err)
 	}
 
 	fileName := "TestByBytesEmpty-aa"
@@ -276,8 +276,8 @@ func TestByBytesEmptyPrefix(t *testing.T) {
 	outDir := t.TempDir()
 	nBytes := int64(512)
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByBytes(nBytes)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByBytes(nBytes)
 	if err == nil {
 		t.Errorf("empty prefix should be error")
 	}
@@ -291,8 +291,8 @@ func TestByBytesInvalidNBytes(t *testing.T) {
 	outDir := t.TempDir()
 	nBytes := int64(0)
 
-	goSplit := NewGoSplit(filePath, prefix, outDir)
-	err := goSplit.ByBytes(nBytes)
+	g := gosplit.New(filePath, prefix, outDir)
+	err := g.ByBytes(nBytes)
 	if err == nil {
 		t.Errorf("non-positive nBytes should be error")
 	}

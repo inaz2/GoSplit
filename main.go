@@ -1,7 +1,7 @@
 package main
 
 import (
-	. "inaz2/GoSplit/gosplit"
+	"inaz2/GoSplit/gosplit"
 	"flag"
 	"fmt"
 	"os"
@@ -62,30 +62,30 @@ With no FILE, or when FILE is -, read standard input.
 		fmt.Println("inaz2/GoSplit 1.0.0")
 		os.Exit(0)
 	case nLines > 0:
-		goSplit := NewGoSplit(filePath, prefix, outDir)
-		err := goSplit.ByLines(nLines)
+		g := gosplit.New(filePath, prefix, outDir)
+		err := g.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	case nNumber > 0:
-		goSplit := NewGoSplit(filePath, prefix, outDir)
-		err := goSplit.ByNumber(nNumber)
+		g := gosplit.New(filePath, prefix, outDir)
+		err := g.ByNumber(nNumber)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	case nBytes > 0:
-		goSplit := NewGoSplit(filePath, prefix, outDir)
-		err := goSplit.ByBytes(nBytes)
+		g := gosplit.New(filePath, prefix, outDir)
+		err := g.ByBytes(nBytes)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	default:
 		nLines = 1000
-		goSplit := NewGoSplit(filePath, prefix, outDir)
-		err := goSplit.ByLines(nLines)
+		g := gosplit.New(filePath, prefix, outDir)
+		err := g.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

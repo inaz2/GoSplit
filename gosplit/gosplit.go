@@ -16,8 +16,8 @@ type GoSplit struct {
 	outDir   string
 }
 
-// NewGoSplit returns a new GoSplit struct
-func NewGoSplit(filePath string, prefix string, outDir string) *GoSplit {
+// New returns a new GoSplit struct
+func New(filePath string, prefix string, outDir string) *GoSplit {
 	return &GoSplit{
 		filePath: filePath,
 		prefix:   prefix,
