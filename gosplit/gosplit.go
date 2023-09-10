@@ -9,15 +9,15 @@ import (
 	"strings"
 )
 
-// GoSplit represents filePath and prefix
+// GoSplit represents filePath, prefix and outDir
 type GoSplit struct {
 	filePath string
 	prefix   string
 	outDir   string
 }
 
-// NewGoSplit returns a new GoSplit struct
-func NewGoSplit(filePath string, prefix string, outDir string) *GoSplit {
+// New returns a new GoSplit struct
+func New(filePath string, prefix string, outDir string) *GoSplit {
 	return &GoSplit{
 		filePath: filePath,
 		prefix:   prefix,
