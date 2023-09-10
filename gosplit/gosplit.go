@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// GoSplit represents filePath and prefix
+// GoSplit represents filePath, prefix and outDir
 type GoSplit struct {
 	filePath string
 	prefix   string
