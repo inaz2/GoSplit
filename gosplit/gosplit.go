@@ -4,8 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -30,6 +33,73 @@ func New(filePath string, prefix string) *GoSplit {
 // This method is mainly for testing.
 func (g *GoSplit) SetOutDir(outDir string) {
 	g.outDir = outDir
+}
+
+// ConvertSizeToByte converts strSize to nBytes, e.g. "1K" -> 1024.
+func (g *GoSplit) ConvertSizeToByte(strSize string) (int64, error) {
+	re := regexp.MustCompile(`^(\d+(?:\.\d+)?)(?:(.)(iB|B)?)?$`)
+	m := re.FindSubmatch([]byte(strSize))
+	if m == nil {
+		return 0, fmt.Errorf("invalid string: %s", strSize)
+	}
+
+	significand, err := strconv.ParseFloat(string(m[1]), 64)
+	if err != nil {
+		return 0, fmt.Errorf("invalid string: %s", strSize)
+	}
+
+	var (
+		base float64
+		multiplier float64
+	)
+
+	switch (string(m[3])) {
+	case "B":
+		base = 1000
+	case "iB":
+		base = 1024
+	default:
+		base = 1024
+	}
+
+	switch (string(m[2])) {
+	case "":
+		multiplier = 1
+	case "b":
+		multiplier = 512
+	case "E":
+		multiplier = math.Pow(base, 6)
+	case "G":
+		multiplier = math.Pow(base, 3)
+	case "K":
+		multiplier = math.Pow(base, 1)
+	case "k":
+		multiplier = math.Pow(base, 1)
+	case "M":
+		multiplier = math.Pow(base, 2)
+	case "m":
+		multiplier = math.Pow(base, 2)
+	case "P":
+		multiplier = math.Pow(base, 5)
+	case "Q":
+		multiplier = math.Pow(base, 10)
+	case "R":
+		multiplier = math.Pow(base, 9)
+	case "T":
+		multiplier = math.Pow(base, 4)
+	case "Y":
+		multiplier = math.Pow(base, 8)
+	case "Z":
+		multiplier = math.Pow(base, 7)
+	default:
+		return 0, fmt.Errorf("invalid string: %s", strSize)
+	}
+
+	n := int64(significand * multiplier)
+	if n <= 0 {
+		return 0, fmt.Errorf("overflow occured: %s -> %d", strSize, n)
+	}
+	return n, nil
 }
 
 // ByLines splits the content of filePath by nLines.
