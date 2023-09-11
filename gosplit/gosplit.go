@@ -104,9 +104,6 @@ func (g *GoSplit) ConvertSizeToByte(strSize string) (int64, error) {
 
 // ByLines splits the content of filePath by nLines.
 func (g *GoSplit) ByLines(nLines int) error {
-	if g.prefix == "" {
-		return fmt.Errorf("prefix must not be empty string")
-	}
 	if nLines <= 0 {
 		return fmt.Errorf("invalid number of lines: %#v", nLines)
 	}
@@ -132,9 +129,6 @@ func (g *GoSplit) ByLines(nLines int) error {
 
 // ByNumber splits the content of filePath into nNumber files.
 func (g *GoSplit) ByNumber(nNumber int) error {
-	if g.prefix == "" {
-		return fmt.Errorf("prefix must not be empty string")
-	}
 	if nNumber <= 0 {
 		return fmt.Errorf("invalid number of chunks: %#v", nNumber)
 	}
@@ -170,9 +164,6 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 
 // ByBytes splits the content of filePath by nBytes.
 func (g *GoSplit) ByBytes(nBytes int64) error {
-	if g.prefix == "" {
-		return fmt.Errorf("prefix must not be empty string")
-	}
 	if nBytes <= 0 {
 		return fmt.Errorf("invalid number of bytes: %#v", nBytes)
 	}

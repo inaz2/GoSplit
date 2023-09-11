@@ -33,7 +33,6 @@ Therefore, the process exits with an error after the 676th output.
 
 * Standard input (including argument string "-")
 * Input file of size 0
-* Prefix string of length 0
 * The number of lines, output files and bytes less than 1
 
 

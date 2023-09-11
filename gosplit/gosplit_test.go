@@ -131,22 +131,6 @@ func TestByLinesEmpty(t *testing.T) {
 	}
 }
 
-func TestByLinesEmptyPrefix(t *testing.T) {
-	t.Parallel()
-
-	filePath := "testdata/example.txt"
-	prefix := ""
-	outDir := t.TempDir()
-	nLines := 10
-
-	g := gosplit.New(filePath, prefix)
-	g.SetOutDir(outDir)
-	err := g.ByLines(nLines)
-	if err == nil {
-		t.Errorf("empty prefix should be error")
-	}
-}
-
 func TestByLinesInvalidNLines(t *testing.T) {
 	t.Parallel()
 
@@ -233,22 +217,6 @@ func TestByNumberStdin(t *testing.T) {
 	}
 }
 
-func TestByNumberEmptyPrefix(t *testing.T) {
-	t.Parallel()
-
-	filePath := "testdata/example.txt"
-	prefix := ""
-	outDir := t.TempDir()
-	nNumber := 4
-
-	g := gosplit.New(filePath, prefix)
-	g.SetOutDir(outDir)
-	err := g.ByNumber(nNumber)
-	if err == nil {
-		t.Errorf("empty prefix should be error")
-	}
-}
-
 func TestByNumberInvalidNBytes(t *testing.T) {
 	t.Parallel()
 
@@ -315,22 +283,6 @@ func TestByBytesEmpty(t *testing.T) {
 	_, err = os.Stat(fileName)
 	if err == nil {
 		t.Errorf("os.Stat(%#v) should be error", fileName)
-	}
-}
-
-func TestByBytesEmptyPrefix(t *testing.T) {
-	t.Parallel()
-
-	filePath := "testdata/example.txt"
-	prefix := ""
-	outDir := t.TempDir()
-	nBytes := int64(512)
-
-	g := gosplit.New(filePath, prefix)
-	g.SetOutDir(outDir)
-	err := g.ByBytes(nBytes)
-	if err == nil {
-		t.Errorf("empty prefix should be error")
 	}
 }
 
