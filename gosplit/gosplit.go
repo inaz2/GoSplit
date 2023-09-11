@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// GoSplit represents filePath, prefix and outDir
+// GoSplit provides the methods for splitting the file
 type GoSplit struct {
 	filePath string
 	prefix   string
@@ -17,11 +17,11 @@ type GoSplit struct {
 }
 
 // New returns a new GoSplit struct
-func New(filePath string, prefix string, outDir string) *GoSplit {
+func New(filePath string, prefix string) *GoSplit {
 	return &GoSplit{
 		filePath: filePath,
 		prefix:   prefix,
-		outDir:   outDir,
+		outDir:   "./",
 	}
 }
 
@@ -52,6 +52,13 @@ func (g *GoSplit) openFileOrStdin() (*os.File, error) {
 		rFile, err := os.Open(g.filePath)
 		return rFile, err
 	}
+}
+
+// SetOutDir changes the directory of output files
+//
+// This method is mainly for testing
+func (g *GoSplit) SetOutDir(outDir string) {
+	g.outDir = outDir
 }
 
 // ByLines splits the content of filePath by nLines
