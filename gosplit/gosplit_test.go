@@ -70,7 +70,7 @@ func TestConvertSizeToByte(t *testing.T) {
 				t.Fatal("not want err:", err)
 			}
 			if tt.want != got {
-				t.Errorf("g.ConvertSizeToByte(%#v) = %#v, want %#v", tt.in, got, tt.want)
+				t.Errorf("ConvertSizeToByte(%#v) = %#v, want %#v", tt.in, got, tt.want)
 			}
 		})
 	}
