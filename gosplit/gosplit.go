@@ -40,12 +40,12 @@ func (g *GoSplit) ConvertSizeToByte(strSize string) (int64, error) {
 	re := regexp.MustCompile(`^(\d+(?:\.\d+)?)(?:(.)(iB|B)?)?$`)
 	m := re.FindSubmatch([]byte(strSize))
 	if m == nil {
-		return 0, fmt.Errorf("invalid string: %s", strSize)
+		return 0, fmt.Errorf("invalid number of bytes: %#v", strSize)
 	}
 
 	significand, err := strconv.ParseFloat(string(m[1]), 64)
 	if err != nil {
-		return 0, fmt.Errorf("invalid string: %s", strSize)
+		return 0, fmt.Errorf("invalid number of bytes: %#v", strSize)
 	}
 
 	var (
@@ -92,12 +92,12 @@ func (g *GoSplit) ConvertSizeToByte(strSize string) (int64, error) {
 	case "Z":
 		multiplier = math.Pow(base, 7)
 	default:
-		return 0, fmt.Errorf("invalid string: %s", strSize)
+		return 0, fmt.Errorf("invalid number of bytes: %#v", strSize)
 	}
 
 	n := int64(significand * multiplier)
 	if n <= 0 {
-		return 0, fmt.Errorf("overflow occured: %s -> %d", strSize, n)
+		return 0, fmt.Errorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
 	}
 	return n, nil
 }
@@ -108,7 +108,7 @@ func (g *GoSplit) ByLines(nLines int) error {
 		return fmt.Errorf("prefix must not be empty string")
 	}
 	if nLines <= 0 {
-		return fmt.Errorf("nLines must be larger than zero")
+		return fmt.Errorf("invalid number of lines: %#v", nLines)
 	}
 
 	var rFile *os.File
@@ -136,7 +136,7 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 		return fmt.Errorf("prefix must not be empty string")
 	}
 	if nNumber <= 0 {
-		return fmt.Errorf("nNumber must be larger than zero")
+		return fmt.Errorf("invalid number of chunks: %#v", nNumber)
 	}
 
 	var rFile *os.File
@@ -174,7 +174,7 @@ func (g *GoSplit) ByBytes(nBytes int64) error {
 		return fmt.Errorf("prefix must not be empty string")
 	}
 	if nBytes <= 0 {
-		return fmt.Errorf("nBytes must be larger than zero")
+		return fmt.Errorf("invalid number of bytes: %#v", nBytes)
 	}
 
 	var rFile *os.File
