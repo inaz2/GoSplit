@@ -62,14 +62,14 @@ Binary prefixes can be used, too: KiB=K, MiB=M, and so on.
 	case bVersion:
 		fmt.Println("inaz2/GoSplit 1.0.0")
 		os.Exit(0)
-	case nLines > 0:
+	case nLines != 0:
 		g := gosplit.New(filePath, prefix)
 		err := g.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-	case nNumber > 0:
+	case nNumber != 0:
 		g := gosplit.New(filePath, prefix)
 		err := g.ByNumber(nNumber)
 		if err != nil {
