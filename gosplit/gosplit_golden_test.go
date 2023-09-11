@@ -21,7 +21,8 @@ func testByLinesGoldenTarget(dir string) error {
 	prefix := "TestByLines-"
 	nLines := 10
 
-	g := gosplit.New(filePath, prefix, dir)
+	g := gosplit.New(filePath, prefix)
+	g.SetOutDir(dir)
 	err := g.ByLines(nLines)
 	if err != nil {
 		return err
@@ -35,7 +36,8 @@ func testByNumberGoldenTarget(dir string) error {
 	prefix := "TestByNumber-"
 	nNumber := 4
 
-	g := gosplit.New(filePath, prefix, dir)
+	g := gosplit.New(filePath, prefix)
+	g.SetOutDir(dir)
 	err := g.ByNumber(nNumber)
 	if err != nil {
 		return err
@@ -49,7 +51,8 @@ func testByBytesGoldenTarget(dir string) error {
 	prefix := "TestByBytes-"
 	nBytes := int64(512)
 
-	g := gosplit.New(filePath, prefix, dir)
+	g := gosplit.New(filePath, prefix)
+	g.SetOutDir(dir)
 	err := g.ByBytes(nBytes)
 	if err != nil {
 		return err

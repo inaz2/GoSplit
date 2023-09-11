@@ -9,25 +9,25 @@ import (
 	"strings"
 )
 
-// GoSplit represents filePath, prefix and outDir
+// GoSplit provides the methods for splitting the file.
 type GoSplit struct {
 	filePath string
 	prefix   string
 	outDir   string
 }
 
-// New returns a new GoSplit struct
-func New(filePath string, prefix string, outDir string) *GoSplit {
+// New returns a new GoSplit struct.
+func New(filePath string, prefix string) *GoSplit {
 	return &GoSplit{
 		filePath: filePath,
 		prefix:   prefix,
-		outDir:   outDir,
+		outDir:   "./",
 	}
 }
 
-// generateOutFilePath returns n-th output file name with prefix
+// generateOutFilePath returns n-th output file name with prefix.
 //
-// only support 2-character suffix; aa , ab, ..., zz
+// only support 2-character suffix; aa , ab, ..., zz.
 func (g *GoSplit) generateOutFilePath(number int) (string, error) {
 	table := strings.Split("abcdefghijklmnopqrstuvwxyz", "")
 	if number >= len(table)*len(table) {
@@ -44,7 +44,7 @@ func (g *GoSplit) generateOutFilePath(number int) (string, error) {
 	return outFilePath, nil
 }
 
-// openFileOrStdin opens filePath or returns os.Stdin
+// openFileOrStdin opens filePath or returns os.Stdin.
 func (g *GoSplit) openFileOrStdin() (*os.File, error) {
 	if g.filePath == "-" {
 		return os.Stdin, nil
@@ -54,7 +54,14 @@ func (g *GoSplit) openFileOrStdin() (*os.File, error) {
 	}
 }
 
-// ByLines splits the content of filePath by nLines
+// SetOutDir changes the directory of output files.
+//
+// This method is mainly for testing.
+func (g *GoSplit) SetOutDir(outDir string) {
+	g.outDir = outDir
+}
+
+// ByLines splits the content of filePath by nLines.
 func (g *GoSplit) ByLines(nLines int) error {
 	if g.prefix == "" {
 		return fmt.Errorf("prefix must not be empty string")
@@ -99,7 +106,7 @@ OuterLoop:
 	return nil
 }
 
-// ByNumber splits the content of filePath into nNumber files
+// ByNumber splits the content of filePath into nNumber files.
 func (g *GoSplit) ByNumber(nNumber int) error {
 	// print error message when filePath is stdin
 	if g.filePath == "-" {
@@ -160,7 +167,7 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 	return nil
 }
 
-// ByBytes splits the content of filePath by nBytes
+// ByBytes splits the content of filePath by nBytes.
 func (g *GoSplit) ByBytes(nBytes int64) error {
 	if g.prefix == "" {
 		return fmt.Errorf("prefix must not be empty string")

@@ -27,7 +27,6 @@ func main() {
 	var (
 		filePath string
 		prefix   string
-		outDir   string
 	)
 
 	flag.Parse()
@@ -36,15 +35,12 @@ func main() {
 	case 0:
 		filePath = "-"
 		prefix = "x"
-		outDir = "./"
 	case 1:
 		filePath = flag.Args()[0]
 		prefix = "x"
-		outDir = "./"
 	default:
 		filePath = flag.Args()[0]
 		prefix = flag.Args()[1]
-		outDir = "./"
 	}
 
 	switch {
@@ -62,21 +58,21 @@ With no FILE, or when FILE is -, read standard input.
 		fmt.Println("inaz2/GoSplit 1.0.0")
 		os.Exit(0)
 	case nLines > 0:
-		g := gosplit.New(filePath, prefix, outDir)
+		g := gosplit.New(filePath, prefix)
 		err := g.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	case nNumber > 0:
-		g := gosplit.New(filePath, prefix, outDir)
+		g := gosplit.New(filePath, prefix)
 		err := g.ByNumber(nNumber)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	case nBytes > 0:
-		g := gosplit.New(filePath, prefix, outDir)
+		g := gosplit.New(filePath, prefix)
 		err := g.ByBytes(nBytes)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -84,7 +80,7 @@ With no FILE, or when FILE is -, read standard input.
 		}
 	default:
 		nLines = 1000
-		g := gosplit.New(filePath, prefix, outDir)
+		g := gosplit.New(filePath, prefix)
 		err := g.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
