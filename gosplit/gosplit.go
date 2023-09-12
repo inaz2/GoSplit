@@ -38,7 +38,7 @@ func (g *GoSplit) SetOutDir(outDir string) {
 // ConvertSizeToByte converts strSize to nBytes, e.g. "1K" -> 1024.
 func (g *GoSplit) ConvertSizeToByte(strSize string) (int64, error) {
 	re := regexp.MustCompile(`^(\d+(?:\.\d+)?)(?:(.)(iB|B)?)?$`)
-	m := re.FindSubmatch([]byte(strSize))
+	m := re.FindStringSubmatch(strSize)
 	if m == nil {
 		return 0, fmt.Errorf("invalid number of bytes: %#v", strSize)
 	}
@@ -53,7 +53,7 @@ func (g *GoSplit) ConvertSizeToByte(strSize string) (int64, error) {
 		multiplier float64
 	)
 
-	switch (string(m[3])) {
+	switch m[3] {
 	case "B":
 		base = 1000
 	case "iB":
@@ -62,7 +62,7 @@ func (g *GoSplit) ConvertSizeToByte(strSize string) (int64, error) {
 		base = 1024
 	}
 
-	switch (string(m[2])) {
+	switch m[2] {
 	case "":
 		multiplier = 1
 	case "b":
@@ -71,13 +71,9 @@ func (g *GoSplit) ConvertSizeToByte(strSize string) (int64, error) {
 		multiplier = math.Pow(base, 6)
 	case "G":
 		multiplier = math.Pow(base, 3)
-	case "K":
+	case "K", "k":
 		multiplier = math.Pow(base, 1)
-	case "k":
-		multiplier = math.Pow(base, 1)
-	case "M":
-		multiplier = math.Pow(base, 2)
-	case "m":
+	case "M", "m":
 		multiplier = math.Pow(base, 2)
 	case "P":
 		multiplier = math.Pow(base, 5)
