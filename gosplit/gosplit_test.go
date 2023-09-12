@@ -51,6 +51,7 @@ func TestParseSize(t *testing.T) {
 		"1E":     {"1E", 1024 * 1024 * 1024 * 1024 * 1024 * 1024, false},
 		"1Z":     {"1Z", 0, true},
 		"0":      {"0", 0, true},
+		"0K":     {"0K", 0, true},
 		"-1":     {"-1", 0, true},
 		"X":      {"X", 0, true},
 		"2X":     {"2X", 0, true},
