@@ -7,7 +7,7 @@ Implemented -l, -n, -b options based on GNU coreutils' split behavior.
 
 To simplify implementation, the following behaviors are different to the original one.
 
-Regarding CHUNKS specified with the -n option, detailed specifications such as K/N and l/N are omitted, and only the number of output files N is specified.
+Regarding CHUNKS specified with the -n option, detailed specifications such as K/N, l/N and r/N are omitted, and only the number of output files N is specified.
 
 The suffix of the output file name is limited to two characters aa-zz, omitting the length extension when the number increases.
 Therefore, the process exits with an error after the 676th output.
@@ -20,7 +20,7 @@ Therefore, the process exits with an error after the 676th output.
 * BSD 3-Clause, as the same as https://github.com/golang/go.
 * GNU AFFERO GENERAL PUBLIC LICENSE Version 3
 
-<ins>_Hereby my gosplit has been started to develop._</ins>
+<ins>_Hereby my GoSplit has been started to develop._</ins>
 
 
 ## Supported options
