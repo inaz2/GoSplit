@@ -51,16 +51,12 @@ Not to build and exec(3) through fork(2) \
 You could try to run as below
 
 ```
-$ go run . --help
-Usage: /tmp/go-build2320408667/b001/exe/GoSplit [OPTION]... [FILE [PREFIX]]
+$ go run . -help
+Usage: /tmp/go-build3796594771/b001/exe/GoSplit [OPTION]... [FILE [PREFIX]]
 Output pieces of FILE to PREFIXaa, PREFIXab, ...;
 default size is 1000 lines, and default PREFIX is 'x'.
 
 With no FILE, or when FILE is -, read standard input.
-
-The SIZE argument is an integer and optional unit (example: 10K is 10*1024).
-Units are K,M,G,T,P,E,Z,Y (powers of 1024) or KB,MB,... (powers of 1000).
-Binary prefixes can be used, too: KiB=K, MiB=M, and so on.
 
   -b string
     	put SIZE bytes per output file
@@ -72,6 +68,10 @@ Binary prefixes can be used, too: KiB=K, MiB=M, and so on.
     	split into N files based on size of input
   -version
     	output version information and exit
+
+The SIZE argument is an integer and optional unit (example: 10K is 10*1024).
+Units are K,M,G,T,P,E,Z,Y (powers of 1024) or KB,MB,... (powers of 1000).
+Binary prefixes can be used, too: KiB=K, MiB=M, and so on.
 ```
 
 
