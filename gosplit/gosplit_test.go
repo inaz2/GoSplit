@@ -37,11 +37,11 @@ func helperCountBytes(t *testing.T, outDir string, filePath string) int64 {
 	return fileSize
 }
 
-func TestConvertSizeToByte(t *testing.T) {
+func TestParseSize(t *testing.T) {
 	t.Parallel()
 
 	filePath := "testdata/example.txt"
-	prefix := "TestConvertSizeToByte-"
+	prefix := "TestParseSize-"
 	cases := map[string]struct {in string; want int64; expectErr bool}{
 		"1":      {"1", 1, false},
 		"1.5":    {"1.5", 1, false},
@@ -62,7 +62,7 @@ func TestConvertSizeToByte(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			g := gosplit.New(filePath, prefix)
-			got, err := g.ConvertSizeToByte(tt.in)
+			got, err := g.ParseSize(tt.in)
 			if tt.expectErr && err == nil {
 				t.Fatal("want err")
 			}
@@ -70,7 +70,7 @@ func TestConvertSizeToByte(t *testing.T) {
 				t.Fatal("not want err:", err)
 			}
 			if tt.want != got {
-				t.Errorf("ConvertSizeToByte(%#v) = %#v, want %#v", tt.in, got, tt.want)
+				t.Errorf("ParseSize(%#v) = %#v, want %#v", tt.in, got, tt.want)
 			}
 		})
 	}

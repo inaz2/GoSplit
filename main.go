@@ -78,7 +78,7 @@ Binary prefixes can be used, too: KiB=K, MiB=M, and so on.
 		}
 	case strSize != "":
 		g := gosplit.New(filePath, prefix)
-		nBytes, err := g.ConvertSizeToByte(strSize)
+		nBytes, err := g.ParseSize(strSize)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

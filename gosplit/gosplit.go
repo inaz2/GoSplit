@@ -35,8 +35,8 @@ func (g *GoSplit) SetOutDir(outDir string) {
 	g.outDir = outDir
 }
 
-// ConvertSizeToByte converts strSize to nBytes, e.g. "1K" -> 1024.
-func (g *GoSplit) ConvertSizeToByte(strSize string) (int64, error) {
+// ParseSize converts strSize to nBytes, e.g. "1K" -> 1024.
+func (g *GoSplit) ParseSize(strSize string) (int64, error) {
 	re := regexp.MustCompile(`^(\d+(?:\.\d+)?)(?:(.)(iB|B)?)?$`)
 	m := re.FindStringSubmatch(strSize)
 	if m == nil {
