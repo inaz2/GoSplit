@@ -42,13 +42,21 @@ func TestParseSize(t *testing.T) {
 
 	filePath := "testdata/example.txt"
 	prefix := "TestParseSize-"
-	cases := map[string]struct {in string; want int64; expectErr bool}{
+	cases := map[string]struct {
+		in        string
+		want      int64
+		expectErr bool
+	}{
 		"1":    {"1", 1, false},
 		"2K":   {"2K", 2 * 1024, false},
 		"2KiB": {"2KiB", 2 * 1024, false},
 		"2KB":  {"2KB", 2 * 1000, false},
 		"7E":   {"7E", 7 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024, false},
 		"8E":   {"8E", 0, true},
+		"9EB":  {"9EB", 9 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000, false},
+		"10EB": {"10EB", 0, true},
+		"1Z":   {"1Z", 0, true},
+		"1ZB":  {"1ZB", 0, true},
 		"0":    {"0", 0, true},
 		"0K":   {"0K", 0, true},
 		"1.5":  {"1.5", 0, true},
