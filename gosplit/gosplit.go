@@ -36,7 +36,7 @@ func (g *GoSplit) SetOutDir(outDir string) {
 
 // ParseSize converts strSize to nBytes, e.g. "10K" -> 10 * 1024.
 func (g *GoSplit) ParseSize(strSize string) (int64, error) {
-	re := regexp.MustCompile(`^([1-9]\d*)(?:(\w)(iB|B)?)?$`)
+	re := regexp.MustCompile(`^(\d+)(?:(\w)(iB|B)?)?$`)
 	m := re.FindStringSubmatch(strSize)
 	if m == nil {
 		return 0, fmt.Errorf("invalid number of bytes: %#v", strSize)
@@ -48,8 +48,8 @@ func (g *GoSplit) ParseSize(strSize string) (int64, error) {
 	}
 
 	var (
-		base uint64
-		multiplier uint64
+		base       int64
+		multiplier int64
 	)
 
 	switch m[3] {
@@ -63,38 +63,47 @@ func (g *GoSplit) ParseSize(strSize string) (int64, error) {
 
 	switch m[2] {
 	case "":
-		multiplier = 1
+		multiplier, err = 1, nil
 	case "b":
-		multiplier = 512
+		multiplier, err = 512, nil
 	case "E":
-		multiplier = powUint64(base, 6)
+		multiplier, err = safePowInt64(base, 6)
 	case "G":
-		multiplier = powUint64(base, 3)
+		multiplier, err = safePowInt64(base, 3)
 	case "K", "k":
-		multiplier = powUint64(base, 1)
+		multiplier, err = safePowInt64(base, 1)
 	case "M", "m":
-		multiplier = powUint64(base, 2)
+		multiplier, err = safePowInt64(base, 2)
 	case "P":
-		multiplier = powUint64(base, 5)
+		multiplier, err = safePowInt64(base, 5)
 	case "Q":
-		multiplier = powUint64(base, 10)
+		multiplier, err = safePowInt64(base, 10)
 	case "R":
-		multiplier = powUint64(base, 9)
+		multiplier, err = safePowInt64(base, 9)
 	case "T":
-		multiplier = powUint64(base, 4)
+		multiplier, err = safePowInt64(base, 4)
 	case "Y":
-		multiplier = powUint64(base, 8)
+		multiplier, err = safePowInt64(base, 8)
 	case "Z":
-		multiplier = powUint64(base, 7)
+		multiplier, err = safePowInt64(base, 7)
 	default:
 		return 0, fmt.Errorf("invalid number of bytes: %#v", strSize)
 	}
-
-	n, err := safeMulInt64(x, int64(multiplier))
 	if err != nil {
 		// integer overflow occured
 		return 0, fmt.Errorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
 	}
+
+	n, err := safeMulInt64(x, multiplier)
+	if err != nil {
+		// integer overflow occured
+		return 0, fmt.Errorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
+	}
+
+	if n <= 0 {
+		return 0, fmt.Errorf("invalid number of bytes: %#v: Numerical result out of range", strSize)
+	}
+
 	return n, nil
 }
 
@@ -183,22 +192,33 @@ func (g *GoSplit) ByBytes(nBytes int64) error {
 	return nil
 }
 
-// powUint64 returns b**k as precise uint64 value.
-func powUint64(b uint64, k uint64) uint64 {
-	result := uint64(1)
-	for x := b; k > 0; x *= x {
-		if k & 1 == 1 {
-			result *= x
-		}
-		k >>= 1
+// safePowInt64 returns b**k with checking integer overflow
+func safePowInt64(b int64, k int64) (int64, error) {
+	var err error
+
+	if k < 0 {
+		return 0, nil
 	}
-	return result
+
+	result := int64(1)
+	for k > 0 {
+		result, err = safeMulInt64(result, b)
+		if err != nil {
+			return 0, err
+		}
+		k--
+	}
+	return result, nil
 }
 
 // safeMulInt64 return x*y with checking integer overflow
 func safeMulInt64(x int64, y int64) (int64, error) {
+	if y == 0 {
+		return 0, nil
+	}
+
 	z := x * y
-	if y == 0 || z/y != x {
+	if z/y != x {
 		return 0, fmt.Errorf("integer overflow occured: %#v * %#v -> %#v", x, y, z)
 	}
 	return z, nil
