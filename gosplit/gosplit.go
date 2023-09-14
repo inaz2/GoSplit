@@ -109,7 +109,11 @@ func (g *GoSplit) ByLines(nLines int) error {
 			return fmt.Errorf("failed to open: %w", err)
 		}
 		defer f.Close()
+
 		rFile = f
+		if _, err := g.checkFileSize(rFile); err != nil {
+			return err
+		}
 	}
 
 	if err := g.byLinesInternal(rFile, nLines); err != nil {
@@ -135,16 +139,13 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 			return fmt.Errorf("failed to open: %w", err)
 		}
 		defer f.Close()
+
 		rFile = f
 	}
 
-	fileInfo, err := rFile.Stat()
+	fileSize, err := g.checkFileSize(rFile)
 	if err != nil {
-		return fmt.Errorf("failed to stat: %w", err)
-	}
-	fileSize := fileInfo.Size()
-	if fileSize == 0 {
-		return nil
+		return err
 	}
 
 	if err := g.byNumberInternal(rFile, fileSize, nNumber); err != nil {
@@ -169,7 +170,11 @@ func (g *GoSplit) ByBytes(nBytes int64) error {
 			return fmt.Errorf("failed to open: %w", err)
 		}
 		defer f.Close()
+
 		rFile = f
+		if _, err := g.checkFileSize(rFile); err != nil {
+			return err
+		}
 	}
 
 	if err := g.byBytesInternal(rFile, nBytes); err != nil {
@@ -215,6 +220,25 @@ func safeMulInt64(x int64, y int64) (int64, error) {
 		return 0, fmt.Errorf("integer overflow occured: %#v * %#v -> %#v", x, y, z)
 	}
 	return z, nil
+}
+
+// checkFileSize returns fileSize with checking disk free space for output files.
+func (g *GoSplit) checkFileSize(rFile *os.File) (int64, error) {
+	fileInfo, err := rFile.Stat()
+	if err != nil {
+		return 0, fmt.Errorf("failed to stat: %w", err)
+	}
+	fileSize := fileInfo.Size()
+
+	freeBytesAvailable, err := getDiskFreeSpace(g.outDir)
+	if err != nil {
+		return 0, fmt.Errorf("failed to getDiskFreeSpace: %w", err)
+	}
+
+	if uint64(fileSize) > freeBytesAvailable {
+		return 0, fmt.Errorf("no free space available")
+	}
+	return fileSize, nil
 }
 
 // generateOutFilePath returns n-th output file name with prefix.
@@ -270,6 +294,10 @@ OuterLoop:
 
 // byNumberInternal splits the content from io.Reader into nNumber files.
 func (g *GoSplit) byNumberInternal(r io.Reader, fileSize int64, nNumber int) error {
+	if fileSize == 0 {
+		return nil
+	}
+
 	chunkSize := fileSize / int64(nNumber)
 
 	for i := 0; i < nNumber; i++ {
