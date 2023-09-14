@@ -189,12 +189,22 @@ func safePowInt64(b int64, k int64) (int64, error) {
 	}
 
 	result := int64(1)
-	for k > 0 {
-		result, err = safeMulInt64(result, b)
+	x := b
+	for {
+		if k&1 == 1 {
+			result, err = safeMulInt64(result, x)
+			if err != nil {
+				return 0, err
+			}
+		}
+		k >>= 1
+		if k <= 0 {
+			break
+		}
+		x, err = safeMulInt64(x, x)
 		if err != nil {
 			return 0, err
 		}
-		k--
 	}
 	return result, nil
 }
