@@ -102,11 +102,11 @@ func TestByLines(t *testing.T) {
 		name   string
 		nLines int
 	}{
-		{"TestByLines-aa", 10},
-		{"TestByLines-ab", 10},
-		{"TestByLines-ac", 10},
-		{"TestByLines-ad", 10},
-		{"TestByLines-ae", 2},
+		{prefix + "aa", 10},
+		{prefix + "ab", 10},
+		{prefix + "ac", 10},
+		{prefix + "ad", 10},
+		{prefix + "ae", 2},
 	}
 
 	g := gosplit.New(filePath, prefix)
@@ -139,10 +139,11 @@ func TestByLinesEmpty(t *testing.T) {
 		t.Fatal("ByLines() failed:", err)
 	}
 
-	fileName := "TestByLinesEmpty-aa"
-	_, err = os.Stat(fileName)
+	outFileName := prefix + "aa"
+	outFilePath := path.Join(outDir, outFileName)
+	_, err = os.Stat(outFilePath)
 	if err == nil {
-		t.Errorf("os.Stat(%#v) should be error", fileName)
+		t.Errorf("os.Stat(%#v) should be error", outFilePath)
 	}
 }
 
@@ -173,10 +174,10 @@ func TestByNumber(t *testing.T) {
 		name   string
 		nBytes int64
 	}{
-		{"TestByNumber-aa", 363},
-		{"TestByNumber-ab", 363},
-		{"TestByNumber-ac", 363},
-		{"TestByNumber-ad", 366},
+		{prefix + "aa", 363},
+		{prefix + "ab", 363},
+		{prefix + "ac", 363},
+		{prefix + "ad", 366},
 	}
 
 	g := gosplit.New(filePath, prefix)
@@ -201,6 +202,15 @@ func TestByNumberEmpty(t *testing.T) {
 	prefix := "TestByNumberEmpty-"
 	outDir := t.TempDir()
 	nNumber := 4
+	outFiles := []struct {
+		name   string
+		nBytes int64
+	}{
+		{prefix + "aa", 0},
+		{prefix + "ab", 0},
+		{prefix + "ac", 0},
+		{prefix + "ad", 0},
+	}
 
 	g := gosplit.New(filePath, prefix)
 	g.SetOutDir(outDir)
@@ -209,10 +219,35 @@ func TestByNumberEmpty(t *testing.T) {
 		t.Fatal("ByNumber() failed:", err)
 	}
 
-	fileName := "TestByNumberEmpty-aa"
-	_, err = os.Stat(fileName)
+	for _, outFile := range outFiles {
+		result := helperCountBytes(t, outDir, outFile.name)
+		if result != outFile.nBytes {
+			t.Errorf("helperCountBytes(%#v) = %#v, want %#v", outFile.name, result, outFile.nBytes)
+		}
+	}
+}
+
+func TestByNumberElideEmptyFiles(t *testing.T) {
+	t.Parallel()
+
+	filePath := "testdata/empty"
+	prefix := "TestByNumberEmpty-"
+	outDir := t.TempDir()
+	nNumber := 4
+
+	g := gosplit.New(filePath, prefix)
+	g.SetOutDir(outDir)
+	g.SetElideEmptyFiles(true)
+	err := g.ByNumber(nNumber)
+	if err != nil {
+		t.Fatal("ByNumber() failed:", err)
+	}
+
+	outFileName := prefix + "aa"
+	outFilePath := path.Join(outDir, outFileName)
+	_, err = os.Stat(outFilePath)
 	if err == nil {
-		t.Errorf("os.Stat(%#v) should be error", fileName)
+		t.Errorf("os.Stat(%#v) should be error", outFilePath)
 	}
 }
 
@@ -259,9 +294,9 @@ func TestByBytes(t *testing.T) {
 		name   string
 		nBytes int64
 	}{
-		{"TestByBytes-aa", 512},
-		{"TestByBytes-ab", 512},
-		{"TestByBytes-ac", 431},
+		{prefix + "aa", 512},
+		{prefix + "ab", 512},
+		{prefix + "ac", 431},
 	}
 
 	g := gosplit.New(filePath, prefix)
@@ -294,10 +329,11 @@ func TestByBytesEmpty(t *testing.T) {
 		t.Fatal("ByBytes() failed:", err)
 	}
 
-	fileName := "TestByBytesEmpty-aa"
-	_, err = os.Stat(fileName)
+	outFileName := prefix + "aa"
+	outFilePath := path.Join(outDir, outFileName)
+	_, err = os.Stat(outFilePath)
 	if err == nil {
-		t.Errorf("os.Stat(%#v) should be error", fileName)
+		t.Errorf("os.Stat(%#v) should be error", outFilePath)
 	}
 }
 
