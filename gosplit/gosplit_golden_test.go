@@ -47,6 +47,21 @@ func testByNumberGoldenTarget(dir string) error {
 	return nil
 }
 
+func testByNumberEmptyGoldenTarget(dir string) error {
+	filePath := "testdata/empty"
+	prefix := "TestByNumberEmpty-"
+	nNumber := 4
+
+	g := gosplit.New(filePath, prefix)
+	g.SetOutDir(dir)
+	err := g.ByNumber(nNumber)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func testByBytesGoldenTarget(dir string) error {
 	filePath := "testdata/example.txt"
 	prefix := "TestByBytes-"
@@ -82,6 +97,18 @@ func TestByNumberGolden(t *testing.T) {
 
 	got := golden.Txtar(t, dir)
 	if diff := golden.Check(t, flagUpdate, "testdata", "TestByNumberGolden", got); diff != "" {
+		t.Error(diff)
+	}
+}
+
+func TestByNumberEmptyGolden(t *testing.T) {
+	dir := t.TempDir()
+	if err := testByNumberEmptyGoldenTarget(dir); err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	got := golden.Txtar(t, dir)
+	if diff := golden.Check(t, flagUpdate, "testdata", "TestByNumberEmptyGolden", got); diff != "" {
 		t.Error(diff)
 	}
 }

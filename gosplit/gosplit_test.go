@@ -139,10 +139,11 @@ func TestByLinesEmpty(t *testing.T) {
 		t.Fatal("ByLines() failed:", err)
 	}
 
-	fileName := "TestByLinesEmpty-aa"
-	_, err = os.Stat(fileName)
+	outFileName := "TestByLinesEmpty-aa"
+	outFilePath := path.Join(outDir, outFileName)
+	_, err = os.Stat(outFilePath)
 	if err == nil {
-		t.Errorf("os.Stat(%#v) should be error", fileName)
+		t.Errorf("os.Stat(%#v) should be error", outFilePath)
 	}
 }
 
@@ -201,6 +202,15 @@ func TestByNumberEmpty(t *testing.T) {
 	prefix := "TestByNumberEmpty-"
 	outDir := t.TempDir()
 	nNumber := 4
+	outFiles := []struct {
+		name   string
+		nBytes int64
+	}{
+		{"TestByNumberEmpty-aa", 0},
+		{"TestByNumberEmpty-ab", 0},
+		{"TestByNumberEmpty-ac", 0},
+		{"TestByNumberEmpty-ad", 0},
+	}
 
 	g := gosplit.New(filePath, prefix)
 	g.SetOutDir(outDir)
@@ -209,10 +219,35 @@ func TestByNumberEmpty(t *testing.T) {
 		t.Fatal("ByNumber() failed:", err)
 	}
 
-	fileName := "TestByNumberEmpty-aa"
-	_, err = os.Stat(fileName)
+	for _, outFile := range outFiles {
+		result := helperCountBytes(t, outDir, outFile.name)
+		if result != outFile.nBytes {
+			t.Errorf("helperCountBytes(%#v) = %#v, want %#v", outFile.name, result, outFile.nBytes)
+		}
+	}
+}
+
+func TestByNumberElideEmptyFiles(t *testing.T) {
+	t.Parallel()
+
+	filePath := "testdata/empty"
+	prefix := "TestByNumberEmpty-"
+	outDir := t.TempDir()
+	nNumber := 4
+
+	g := gosplit.New(filePath, prefix)
+	g.SetOutDir(outDir)
+	g.SetElideEmptyFiles(true)
+	err := g.ByNumber(nNumber)
+	if err != nil {
+		t.Fatal("ByNumber() failed:", err)
+	}
+
+	outFileName := "TestByNumberEmpty-aa"
+	outFilePath := path.Join(outDir, outFileName)
+	_, err = os.Stat(outFilePath)
 	if err == nil {
-		t.Errorf("os.Stat(%#v) should be error", fileName)
+		t.Errorf("os.Stat(%#v) should be error", outFilePath)
 	}
 }
 
@@ -294,10 +329,11 @@ func TestByBytesEmpty(t *testing.T) {
 		t.Fatal("ByBytes() failed:", err)
 	}
 
-	fileName := "TestByBytesEmpty-aa"
-	_, err = os.Stat(fileName)
+	outFileName := "TestByBytesEmpty-aa"
+	outFilePath := path.Join(outDir, outFileName)
+	_, err = os.Stat(outFilePath)
 	if err == nil {
-		t.Errorf("os.Stat(%#v) should be error", fileName)
+		t.Errorf("os.Stat(%#v) should be error", outFilePath)
 	}
 }
 
