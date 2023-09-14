@@ -47,13 +47,14 @@ func TestParseSize(t *testing.T) {
 		want      int64
 		expectErr bool
 	}{
-		"1":    {"1", 1, false},
+		"2":    {"2", 2, false},
+		"2b":   {"2b", 2 * 512, false},
 		"2K":   {"2K", 2 * 1024, false},
 		"2KiB": {"2KiB", 2 * 1024, false},
 		"2KB":  {"2KB", 2 * 1000, false},
 		"7E":   {"7E", 7 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024, false},
-		"8E":   {"8E", 0, true},
 		"9EB":  {"9EB", 9 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000, false},
+		"8E":   {"8E", 0, true},
 		"10EB": {"10EB", 0, true},
 		"1Z":   {"1Z", 0, true},
 		"1ZB":  {"1ZB", 0, true},
@@ -61,6 +62,10 @@ func TestParseSize(t *testing.T) {
 		"0K":   {"0K", 0, true},
 		"1.5":  {"1.5", 0, true},
 		"-1":   {"-1", 0, true},
+		"2iB":  {"2iB", 0, true},
+		"2B":   {"2B", 0, true},
+		"2biB": {"2biB", 0, true},
+		"2bB":  {"2bB", 0, true},
 		"X":    {"X", 0, true},
 		"2X":   {"2X", 0, true},
 		"2KX":  {"2KX", 0, true},
