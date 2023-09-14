@@ -88,3 +88,8 @@ $ go test -v ./...
 * Test methods is created for each purpose for each option.
 * Test that the pairs of each output file name and the number of lines/bytes matches.
 * Create output files in temporary directories, and remove at the end of the test.
+
+
+## Debugging
+
+To output debug information, set any value to `DEBUG` environment variable.
