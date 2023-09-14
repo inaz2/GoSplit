@@ -7,10 +7,11 @@ Implemented -l, -n, -b options based on GNU coreutils' split behavior.
 
 To simplify implementation, the following behaviors are different to the original one.
 
-Regarding CHUNKS specified with the -n option, detailed specifications such as K/N, l/N and r/N are omitted, and only the number of output files N is specified.
+Regarding CHUNKS specified with the -n option, only the number of output files N is accepted.
+Other modes such as K/N, l/N and r/N are not supported.
 
-The suffix of the output file name is limited to two characters aa-zz, omitting the length extension when the number increases.
-Therefore, the process exits with an error after the 676th output.
+The suffix of the output file name is limited to two characters aa-zz, and the process exits with an error after the 676th output.
+The suffix length extension is not implemented for safety.
 
 
 ## LICENSE
@@ -33,7 +34,9 @@ Therefore, the process exits with an error after the 676th output.
 
 * Standard input (including argument string "-")
 * Input file of size 0
-* The number of lines, output files and bytes less than 1
+* The number of lines and output files less than 1
+* The size less than 1
+* The size with invalid format such as "-1", "1.5" and "2X"
 
 
 ## Performance notice
