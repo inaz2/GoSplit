@@ -11,11 +11,14 @@ import (
 )
 
 var (
-	bHelp    bool
-	bVersion bool
-	nLines   int
-	nNumber  int
-	strSize  string
+	bHelp            bool
+	bVersion         bool
+	nLines           int
+	nNumber          int
+	strSize          string
+	bNumericSuffix   bool
+	bElideEmptyFiles bool
+	bVerbose         bool
 )
 
 func init() {
@@ -24,6 +27,9 @@ func init() {
 	flag.IntVar(&nLines, "l", 0, "put NUMBER lines/records per output file")
 	flag.IntVar(&nNumber, "n", 0, "split into N files based on size of input")
 	flag.StringVar(&strSize, "b", "", "put SIZE bytes per output file")
+	flag.BoolVar(&bNumericSuffix, "d", false, "use numeric suffixes starting at 0, not alphabetic")
+	flag.BoolVar(&bElideEmptyFiles, "e", false, "do not generate empty output files with '-n'")
+	flag.BoolVar(&bVerbose, "verbose", false, "print a diagnostic just before each output file is opened")
 }
 
 func main() {
@@ -51,6 +57,11 @@ func main() {
 		log.SetOutput(io.Discard)
 	}
 
+	g := gosplit.New(filePath, prefix)
+	g.SetNumericSuffix(bNumericSuffix)
+	g.SetElideEmptyFiles(bElideEmptyFiles)
+	g.SetVerbose(bVerbose)
+
 	switch {
 	case bHelp:
 		usageFormat := `Usage: %s [OPTION]... [FILE [PREFIX]]
@@ -73,21 +84,18 @@ Binary prefixes can be used, too: KiB=K, MiB=M, and so on.
 		fmt.Println("inaz2/GoSplit 1.0.0")
 		os.Exit(0)
 	case nLines != 0:
-		g := gosplit.New(filePath, prefix)
 		err := g.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			log.Fatalf("%+v", err)
 		}
 	case nNumber != 0:
-		g := gosplit.New(filePath, prefix)
 		err := g.ByNumber(nNumber)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			log.Fatalf("%+v", err)
 		}
 	case strSize != "":
-		g := gosplit.New(filePath, prefix)
 		nBytes, err := g.ParseSize(strSize)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -100,7 +108,6 @@ Binary prefixes can be used, too: KiB=K, MiB=M, and so on.
 		}
 	default:
 		nLines = 1000
-		g := gosplit.New(filePath, prefix)
 		err := g.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
