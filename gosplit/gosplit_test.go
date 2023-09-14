@@ -102,11 +102,11 @@ func TestByLines(t *testing.T) {
 		name   string
 		nLines int
 	}{
-		{"TestByLines-aa", 10},
-		{"TestByLines-ab", 10},
-		{"TestByLines-ac", 10},
-		{"TestByLines-ad", 10},
-		{"TestByLines-ae", 2},
+		{prefix + "aa", 10},
+		{prefix + "ab", 10},
+		{prefix + "ac", 10},
+		{prefix + "ad", 10},
+		{prefix + "ae", 2},
 	}
 
 	g := gosplit.New(filePath, prefix)
@@ -139,7 +139,7 @@ func TestByLinesEmpty(t *testing.T) {
 		t.Fatal("ByLines() failed:", err)
 	}
 
-	outFileName := "TestByLinesEmpty-aa"
+	outFileName := prefix + "aa"
 	outFilePath := path.Join(outDir, outFileName)
 	_, err = os.Stat(outFilePath)
 	if err == nil {
@@ -174,10 +174,10 @@ func TestByNumber(t *testing.T) {
 		name   string
 		nBytes int64
 	}{
-		{"TestByNumber-aa", 363},
-		{"TestByNumber-ab", 363},
-		{"TestByNumber-ac", 363},
-		{"TestByNumber-ad", 366},
+		{prefix + "aa", 363},
+		{prefix + "ab", 363},
+		{prefix + "ac", 363},
+		{prefix + "ad", 366},
 	}
 
 	g := gosplit.New(filePath, prefix)
@@ -206,10 +206,10 @@ func TestByNumberEmpty(t *testing.T) {
 		name   string
 		nBytes int64
 	}{
-		{"TestByNumberEmpty-aa", 0},
-		{"TestByNumberEmpty-ab", 0},
-		{"TestByNumberEmpty-ac", 0},
-		{"TestByNumberEmpty-ad", 0},
+		{prefix + "aa", 0},
+		{prefix + "ab", 0},
+		{prefix + "ac", 0},
+		{prefix + "ad", 0},
 	}
 
 	g := gosplit.New(filePath, prefix)
@@ -243,7 +243,7 @@ func TestByNumberElideEmptyFiles(t *testing.T) {
 		t.Fatal("ByNumber() failed:", err)
 	}
 
-	outFileName := "TestByNumberEmpty-aa"
+	outFileName := prefix + "aa"
 	outFilePath := path.Join(outDir, outFileName)
 	_, err = os.Stat(outFilePath)
 	if err == nil {
@@ -294,9 +294,9 @@ func TestByBytes(t *testing.T) {
 		name   string
 		nBytes int64
 	}{
-		{"TestByBytes-aa", 512},
-		{"TestByBytes-ab", 512},
-		{"TestByBytes-ac", 431},
+		{prefix + "aa", 512},
+		{prefix + "ab", 512},
+		{prefix + "ac", 431},
 	}
 
 	g := gosplit.New(filePath, prefix)
@@ -329,7 +329,7 @@ func TestByBytesEmpty(t *testing.T) {
 		t.Fatal("ByBytes() failed:", err)
 	}
 
-	outFileName := "TestByBytesEmpty-aa"
+	outFileName := prefix + "aa"
 	outFilePath := path.Join(outDir, outFileName)
 	_, err = os.Stat(outFilePath)
 	if err == nil {
