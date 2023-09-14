@@ -210,12 +210,8 @@ func safePowInt64(b int64, k int64) (int64, error) {
 
 // safeMulInt64 return x*y with checking integer overflow
 func safeMulInt64(x int64, y int64) (int64, error) {
-	if y == 0 {
-		return 0, nil
-	}
-
 	z := x * y
-	if z/y != x {
+	if y != 0 && z/y != x {
 		return 0, fmt.Errorf("integer overflow occured: %#v * %#v -> %#v", x, y, z)
 	}
 	return z, nil
