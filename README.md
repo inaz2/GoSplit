@@ -13,6 +13,7 @@ Other modes such as K/N, l/N and r/N are not supported.
 The suffix of the output file name is limited to two characters aa-zz, and the process exits with an error after the 676th output.
 The suffix length extension is not implemented for safety.
 
+If the disk free space is less than the input file size, the process exits with an error.
 
 ## LICENSE
 
