@@ -1,3 +1,4 @@
+// Package gosplit implements file splitting.
 package gosplit
 
 import (
