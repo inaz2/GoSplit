@@ -5,6 +5,8 @@ import (
 
 	"flag"
 	"fmt"
+	"io"
+	"log"
 	"os"
 )
 
@@ -44,6 +46,11 @@ func main() {
 		prefix = flag.Args()[1]
 	}
 
+	// discard log output if envvar DEBUG is not set
+	if os.Getenv("DEBUG") == "" {
+		log.SetOutput(io.Discard)
+	}
+
 	switch {
 	case bHelp:
 		usageFormat := `Usage: %s [OPTION]... [FILE [PREFIX]]
@@ -70,26 +77,26 @@ Binary prefixes can be used, too: KiB=K, MiB=M, and so on.
 		err := g.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			log.Fatalf("%+v", err)
 		}
 	case nNumber != 0:
 		g := gosplit.New(filePath, prefix)
 		err := g.ByNumber(nNumber)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			log.Fatalf("%+v", err)
 		}
 	case strSize != "":
 		g := gosplit.New(filePath, prefix)
 		nBytes, err := g.ParseSize(strSize)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			log.Fatalf("%+v", err)
 		}
 		err = g.ByBytes(nBytes)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			log.Fatalf("%+v", err)
 		}
 	default:
 		nLines = 1000
@@ -97,7 +104,7 @@ Binary prefixes can be used, too: KiB=K, MiB=M, and so on.
 		err := g.ByLines(nLines)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			log.Fatalf("%+v", err)
 		}
 	}
 }

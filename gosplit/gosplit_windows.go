@@ -19,7 +19,7 @@ func getDiskFreeSpace(dirPath string) (uint64, error) {
 	dirPath = filepath.FromSlash(dirPath)
 	err := windows.GetDiskFreeSpaceEx(windows.StringToUTF16Ptr(dirPath), &freeBytesAvailableToCaller, &totalNumberOfBytes, &totalNumberOfFreeBytes)
 	if err != nil {
-		return 0, err
+		return 0, GoSplitErrorf("failed to windows.GetFreeSpaceEx: %w", err)
 	}
 	return freeBytesAvailableToCaller, nil
 }

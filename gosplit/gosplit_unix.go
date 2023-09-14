@@ -11,7 +11,7 @@ func getDiskFreeSpace(dirPath string) (uint64, error) {
 	var stat unix.Statfs_t
 
 	if err := unix.Statfs(dirPath, &stat); err != nil {
-		return 0, err
+		return 0, GoSplitErrorf("faied to unix.Statfs: %w", err)
 	}
 	freeBytesAvailable := stat.Bavail * uint64(stat.Bsize)
 	return freeBytesAvailable, nil
