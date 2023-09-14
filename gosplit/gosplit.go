@@ -36,7 +36,7 @@ func (g *GoSplit) SetOutDir(outDir string) {
 
 // ParseSize converts strSize to nBytes, e.g. "10K" -> 10 * 1024.
 func (g *GoSplit) ParseSize(strSize string) (int64, error) {
-	re := regexp.MustCompile(`^(\d+)(?:(\w)(iB|B)?)?$`)
+	re := regexp.MustCompile(`^(\d+)(b|(\w)(iB|B)?)?$`)
 	m := re.FindStringSubmatch(strSize)
 	if m == nil {
 		return 0, fmt.Errorf("invalid number of bytes: %#v", strSize)
@@ -52,7 +52,7 @@ func (g *GoSplit) ParseSize(strSize string) (int64, error) {
 		multiplier int64
 	)
 
-	switch m[3] {
+	switch m[4] {
 	case "B":
 		base = 1000
 	case "iB":
@@ -63,35 +63,23 @@ func (g *GoSplit) ParseSize(strSize string) (int64, error) {
 
 	switch m[2] {
 	case "":
-		multiplier, err = 1, nil
+		multiplier = 1
 	case "b":
-		multiplier, err = 512, nil
-	case "E":
-		multiplier, err = safePowInt64(base, 6)
-	case "G":
-		multiplier, err = safePowInt64(base, 3)
-	case "K", "k":
-		multiplier, err = safePowInt64(base, 1)
-	case "M", "m":
-		multiplier, err = safePowInt64(base, 2)
-	case "P":
-		multiplier, err = safePowInt64(base, 5)
-	case "Q":
-		multiplier, err = safePowInt64(base, 10)
-	case "R":
-		multiplier, err = safePowInt64(base, 9)
-	case "T":
-		multiplier, err = safePowInt64(base, 4)
-	case "Y":
-		multiplier, err = safePowInt64(base, 8)
-	case "Z":
-		multiplier, err = safePowInt64(base, 7)
+		multiplier = 512
 	default:
-		return 0, fmt.Errorf("invalid number of bytes: %#v", strSize)
-	}
-	if err != nil {
-		// integer overflow occured
-		return 0, fmt.Errorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
+		exponentMap := map[string]int64{
+			"E": 6, "G": 3, "K": 1, "k": 1, "M": 2, "m": 2,
+			"P": 5, "Q": 10, "R": 9, "T": 4, "Y": 8, "Z": 7,
+		}
+		exponent, ok := exponentMap[m[3]]
+		if !ok {
+			return 0, fmt.Errorf("invalid number of bytes: %#v", strSize)
+		}
+		multiplier, err = safePowInt64(base, exponent)
+		if err != nil {
+			// integer overflow occured
+			return 0, fmt.Errorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
+		}
 	}
 
 	n, err := safeMulInt64(x, multiplier)
