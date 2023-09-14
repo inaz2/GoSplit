@@ -294,10 +294,6 @@ OuterLoop:
 
 // byNumberInternal splits the content from io.Reader into nNumber files.
 func (g *GoSplit) byNumberInternal(r io.Reader, fileSize int64, nNumber int) error {
-	if fileSize == 0 {
-		return nil
-	}
-
 	chunkSize := fileSize / int64(nNumber)
 
 	for i := 0; i < nNumber; i++ {
