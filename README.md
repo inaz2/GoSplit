@@ -10,7 +10,7 @@ To simplify implementation, the following behaviors are different to the origina
 Regarding CHUNKS specified with the -n option, only the number of output files N is accepted.
 Other modes such as K/N, l/N and r/N are not supported.
 
-The suffix of the output file name is limited to two characters aa-zz, and the process exits with an error after the 676th output.
+The suffix of the output file name is limited to two characters aa-zz, and the process exits with an error after the 676th output (with -d option, 00-99 and the 100th output).
 The suffix length extension is not implemented for safety.
 
 If the disk free space is less than the input file size, the process exits with an error.
@@ -28,6 +28,7 @@ If the disk free space is less than the input file size, the process exits with 
 ## Supported options
 
 * -l, -n, -b
+* -d, -e, --verbose
 * --help, --version
 
 
@@ -56,7 +57,7 @@ You could try to run as below
 
 ```
 $ go run . -help
-Usage: /tmp/go-build3796594771/b001/exe/GoSplit [OPTION]... [FILE [PREFIX]]
+Usage: /tmp/go-build3934742828/b001/exe/GoSplit [OPTION]... [FILE [PREFIX]]
 Output pieces of FILE to PREFIXaa, PREFIXab, ...;
 default size is 1000 lines, and default PREFIX is 'x'.
 
@@ -64,12 +65,16 @@ With no FILE, or when FILE is -, read standard input.
 
   -b string
     	put SIZE bytes per output file
+  -d	use numeric suffixes starting at 0, not alphabetic
+  -e	do not generate empty output files with '-n'
   -help
     	display this help and exit
   -l int
     	put NUMBER lines/records per output file
   -n int
     	split into N files based on size of input
+  -verbose
+    	print a diagnostic just before each output file is opened
   -version
     	output version information and exit
 
