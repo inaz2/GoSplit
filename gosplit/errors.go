@@ -11,6 +11,12 @@ type GoSplitError struct {
 	stack []byte
 }
 
+// GoSplitErrorf returns a new GoSplitError.
+func GoSplitErrorf(format string, a ...any) *GoSplitError {
+	err := fmt.Errorf(format, a...)
+	return &GoSplitError{err: err, stack: debug.Stack()}
+}
+
 // Error implemenrts error.Error.
 func (e *GoSplitError) Error() string {
 	return e.err.Error()
@@ -26,10 +32,4 @@ func (e *GoSplitError) Format(f fmt.State, verb rune) {
 	} else if verb == 'v' || verb == 's' {
 		f.Write([]byte(e.Error()))
 	}
-}
-
-// GoSplitErrorf returns a new GoSplitError.
-func GoSplitErrorf(format string, a ...any) *GoSplitError {
-	err := fmt.Errorf(format, a...)
-	return &GoSplitError{err: err, stack: debug.Stack()}
 }
