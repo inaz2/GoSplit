@@ -8,7 +8,6 @@ import (
 	"path"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 // GoSplit provides the methods for splitting the file.
@@ -189,12 +188,22 @@ func safePowInt64(b int64, k int64) (int64, error) {
 	}
 
 	result := int64(1)
-	for k > 0 {
-		result, err = safeMulInt64(result, b)
+	x := b
+	for {
+		if k&1 == 1 {
+			result, err = safeMulInt64(result, x)
+			if err != nil {
+				return 0, err
+			}
+		}
+		k >>= 1
+		if k <= 0 {
+			break
+		}
+		x, err = safeMulInt64(x, x)
 		if err != nil {
 			return 0, err
 		}
-		k--
 	}
 	return result, nil
 }
@@ -216,7 +225,7 @@ func safeMulInt64(x int64, y int64) (int64, error) {
 //
 // only support 2-character suffix; aa , ab, ..., zz.
 func (g *GoSplit) generateOutFilePath(number int) (string, error) {
-	table := strings.Split("abcdefghijklmnopqrstuvwxyz", "")
+	table := []byte("abcdefghijklmnopqrstuvwxyz")
 	if number >= len(table)*len(table) {
 		return "", fmt.Errorf("output file suffixes exhausted")
 	}
@@ -224,7 +233,7 @@ func (g *GoSplit) generateOutFilePath(number int) (string, error) {
 	n0 := number % len(table)
 	number = number / len(table)
 	n1 := number % len(table)
-	suffix := table[n1] + table[n0]
+	suffix := string([]byte{table[n1], table[n0]})
 
 	outFileName := g.prefix + suffix
 	outFilePath := path.Join(g.outDir, outFileName)
