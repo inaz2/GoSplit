@@ -12,9 +12,12 @@ import (
 
 // GoSplit provides the methods for splitting the file.
 type GoSplit struct {
-	filePath string
-	prefix   string
-	outDir   string
+	filePath         string
+	prefix           string
+	outDir           string
+	bNumericSuffix   bool
+	bElideEmptyFiles bool
+	bVerbose         bool
 }
 
 // New returns a new GoSplit struct.
@@ -24,6 +27,21 @@ func New(filePath string, prefix string) *GoSplit {
 		prefix:   prefix,
 		outDir:   "./",
 	}
+}
+
+// SetNumericSuffix changes bNumericSuffix flag.
+func (g *GoSplit) SetNumericSuffix(bNumericSuffix bool) {
+	g.bNumericSuffix = bNumericSuffix
+}
+
+// SetNumericSuffix changes bElideEmptyFiles flag.
+func (g *GoSplit) SetElideEmptyFiles(bElideEmptyFiles bool) {
+	g.bElideEmptyFiles = bElideEmptyFiles
+}
+
+// SetNumericSuffix changes bVerbose flag.
+func (g *GoSplit) SetVerbose(bVerbose bool) {
+	g.bVerbose = bVerbose
 }
 
 // SetOutDir changes the directory of output files.
@@ -148,6 +166,10 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 		return err
 	}
 
+	if g.bElideEmptyFiles && fileSize == 0 {
+		return nil
+	}
+
 	if err := g.byNumberInternal(rFile, fileSize, nNumber); err != nil {
 		return err
 	}
@@ -245,7 +267,14 @@ func (g *GoSplit) checkFileSize(rFile *os.File) (int64, error) {
 //
 // only support 2-character suffix; aa , ab, ..., zz.
 func (g *GoSplit) generateOutFilePath(number int) (string, error) {
-	table := []byte("abcdefghijklmnopqrstuvwxyz")
+	var table []byte
+
+	if g.bNumericSuffix {
+		table = []byte("0123456789")
+	} else {
+		table = []byte("abcdefghijklmnopqrstuvwxyz")
+	}
+
 	if number >= len(table)*len(table) {
 		return "", GoSplitErrorf("output file suffixes exhausted")
 	}
@@ -273,6 +302,9 @@ OuterLoop:
 		wFile, err := os.Create(outFilePath)
 		if err != nil {
 			return GoSplitErrorf("failed to create: %w", err)
+		}
+		if g.bVerbose {
+			fmt.Printf("creating file %#v\n", outFilePath)
 		}
 		for j := 0; j < nLines; j++ {
 			if !scanner.Scan() {
@@ -304,6 +336,9 @@ func (g *GoSplit) byNumberInternal(r io.Reader, fileSize int64, nNumber int) err
 		wFile, err := os.Create(outFilePath)
 		if err != nil {
 			return GoSplitErrorf("failed to create: %w", err)
+		}
+		if g.bVerbose {
+			fmt.Printf("creating file %#v\n", outFilePath)
 		}
 		// the last file size should be larger than or equal to chunkSize
 		if i < nNumber-1 {
@@ -337,6 +372,9 @@ func (g *GoSplit) byBytesInternal(r io.Reader, nBytes int64) error {
 		wFile, err := os.Create(outFilePath)
 		if err != nil {
 			return GoSplitErrorf("failed to create: %w", err)
+		}
+		if g.bVerbose {
+			fmt.Printf("creating file %#v\n", outFilePath)
 		}
 		written, err := io.CopyN(wFile, r, nBytes)
 		if written < nBytes {
