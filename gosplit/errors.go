@@ -39,7 +39,7 @@ func (e *GoSplitError) Is(target error) bool {
 	return ok
 }
 
-// Unwrap unwraps GoSplitError.
+// Unwrap returns the wrapped error.
 func (e *GoSplitError) Unwrap() error {
 	return e.err
 }
