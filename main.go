@@ -60,7 +60,9 @@ func main() {
 	g := gosplit.New(filePath, prefix)
 	g.SetNumericSuffix(bNumericSuffix)
 	g.SetElideEmptyFiles(bElideEmptyFiles)
-	g.SetVerbose(bVerbose)
+	if bVerbose {
+		g.SetVerboseWriter(os.Stdout)
+	}
 
 	switch {
 	case bHelp:
