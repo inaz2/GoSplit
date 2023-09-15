@@ -86,7 +86,7 @@ func TestGoSplitErrorUnwrap(t *testing.T) {
 
 	want := errors.New("an error")
 
-	err := gosplit.GoSplitErrorf("TestGoSplitErrorIs: %w", want)
+	err := gosplit.GoSplitErrorf("TestGoSplitErrorUnwrap: %w", want)
 	if ok := errors.Is(err, want); !ok {
 		t.Errorf("errors.Is() should return true")
 	}
