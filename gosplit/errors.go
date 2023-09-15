@@ -12,8 +12,11 @@ type GoSplitError struct {
 	stack []byte
 }
 
+// GoSplitErr represents a GoSplitError value for errors.Is().
+var GoSplitErr *GoSplitError
+
 // GoSplitErrorf returns a new GoSplitError.
-func GoSplitErrorf(format string, a ...any) *GoSplitError {
+func GoSplitErrorf(format string, a ...any) error {
 	err := fmt.Errorf(format, a...)
 
 	var t *GoSplitError
@@ -28,6 +31,17 @@ func GoSplitErrorf(format string, a ...any) *GoSplitError {
 // Error implemenrts error.Error.
 func (e *GoSplitError) Error() string {
 	return e.err.Error()
+}
+
+// Is returns true if target is GoSplitError.
+func (e *GoSplitError) Is(target error) bool {
+	_, ok := target.(*GoSplitError)
+	return ok
+}
+
+// Unwrap unwraps GoSplitError.
+func (e *GoSplitError) Unwrap() error {
+	return e.err
 }
 
 // Format implements fmt.Formatter, implemented "%+v" with stacktrace.
