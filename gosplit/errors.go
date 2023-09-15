@@ -1,6 +1,7 @@
 package gosplit
 
 import (
+	"errors"
 	"fmt"
 	"runtime/debug"
 )
@@ -13,8 +14,14 @@ type GoSplitError struct {
 
 // GoSplitErrorf returns a new GoSplitError.
 func GoSplitErrorf(format string, a ...any) *GoSplitError {
+	t := new(GoSplitError)
 	err := fmt.Errorf(format, a...)
-	return &GoSplitError{err: err, stack: debug.Stack()}
+	if errors.As(err, &t) {
+		// keep original stacktrace
+		return &GoSplitError{err: err, stack: t.stack}
+	} else {
+		return &GoSplitError{err: err, stack: debug.Stack()}
+	}
 }
 
 // Error implemenrts error.Error.
@@ -22,7 +29,7 @@ func (e *GoSplitError) Error() string {
 	return e.err.Error()
 }
 
-// Format implements fmt.Formatter.
+// Format implements fmt.Formatter, implemented "%+v" with stacktrace.
 func (e *GoSplitError) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 'v':
