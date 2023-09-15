@@ -14,8 +14,9 @@ type GoSplitError struct {
 
 // GoSplitErrorf returns a new GoSplitError.
 func GoSplitErrorf(format string, a ...any) *GoSplitError {
-	t := new(GoSplitError)
 	err := fmt.Errorf(format, a...)
+
+	var t *GoSplitError
 	if errors.As(err, &t) {
 		// keep original stacktrace
 		return &GoSplitError{err: err, stack: t.stack}
