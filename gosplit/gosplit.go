@@ -18,15 +18,16 @@ type GoSplit struct {
 	outDir           string
 	bNumericSuffix   bool
 	bElideEmptyFiles bool
-	bVerbose         bool
+	verboseWriter    io.Writer
 }
 
 // New returns a new GoSplit struct.
 func New(filePath string, prefix string) *GoSplit {
 	return &GoSplit{
-		filePath: filePath,
-		prefix:   prefix,
-		outDir:   "./",
+		filePath:      filePath,
+		prefix:        prefix,
+		outDir:        "./",
+		verboseWriter: io.Discard,
 	}
 }
 
@@ -41,8 +42,8 @@ func (g *GoSplit) SetElideEmptyFiles(bElideEmptyFiles bool) {
 }
 
 // SetNumericSuffix changes bVerbose flag.
-func (g *GoSplit) SetVerbose(bVerbose bool) {
-	g.bVerbose = bVerbose
+func (g *GoSplit) SetVerboseWriter(w io.Writer) {
+	g.verboseWriter = w
 }
 
 // SetOutDir changes the directory of output files.
@@ -304,9 +305,8 @@ OuterLoop:
 		if err != nil {
 			return GoSplitErrorf("failed to create: %w", err)
 		}
-		if g.bVerbose {
-			fmt.Printf("creating file %#v\n", outFilePath)
-		}
+		fmt.Fprintf(g.verboseWriter, "creating file %#v\n", outFilePath)
+
 		for j := 0; j < nLines; j++ {
 			if !scanner.Scan() {
 				if j == 0 {
@@ -338,9 +338,8 @@ func (g *GoSplit) byNumberInternal(r io.Reader, fileSize int64, nNumber int) err
 		if err != nil {
 			return GoSplitErrorf("failed to create: %w", err)
 		}
-		if g.bVerbose {
-			fmt.Printf("creating file %#v\n", outFilePath)
-		}
+		fmt.Fprintf(g.verboseWriter, "creating file %#v\n", outFilePath)
+
 		// the last file size should be larger than or equal to chunkSize
 		if i < nNumber-1 {
 			written, err := io.CopyN(wFile, r, chunkSize)
@@ -374,9 +373,8 @@ func (g *GoSplit) byBytesInternal(r io.Reader, nBytes int64) error {
 		if err != nil {
 			return GoSplitErrorf("failed to create: %w", err)
 		}
-		if g.bVerbose {
-			fmt.Printf("creating file %#v\n", outFilePath)
-		}
+		fmt.Fprintf(g.verboseWriter, "creating file %#v\n", outFilePath)
+
 		written, err := io.CopyN(wFile, r, nBytes)
 		if written < nBytes {
 			if written == 0 {
