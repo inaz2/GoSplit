@@ -24,12 +24,14 @@ func (e *GoSplitError) Error() string {
 
 // Format implements fmt.Formatter.
 func (e *GoSplitError) Format(f fmt.State, verb rune) {
-	if f.Flag('+') {
-		if verb == 'v' {
-			f.Write([]byte(e.Error() + "\n"))
-			f.Write(e.stack)
+	switch verb {
+	case 'v':
+		if f.Flag('+') {
+			fmt.Fprintf(f, "%v\n%s", e.err, e.stack)
+		} else {
+			fmt.Fprintf(f, "%v", e.err)
 		}
-	} else if verb == 'v' || verb == 's' {
-		f.Write([]byte(e.Error()))
+	case 's', 'q', 'x', 'X':
+		fmt.Fprintf(f, "%"+string(verb), e.err)
 	}
 }
