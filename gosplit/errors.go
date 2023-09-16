@@ -44,16 +44,28 @@ func (e *goSplitError) Unwrap() error {
 	return e.err
 }
 
-// Format implements fmt.Formatter, implemented "%+v" with stacktrace.
+// Format implements fmt.Formatter, extending "%+v" appends stacktrace.
 func (e *goSplitError) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 'v':
-		if f.Flag('+') {
-			fmt.Fprintf(f, "%v\n%s", e.err, e.stack)
+		var (
+			message    string
+			stacktrace string
+		)
+
+		if f.Flag('#') {
+			message = fmt.Sprintf("%#v", e.err)
 		} else {
-			fmt.Fprintf(f, "%v", e.err)
+			message = fmt.Sprintf("%v", e.err)
 		}
-	case 's', 'q', 'x', 'X':
+		if f.Flag('+') {
+			stacktrace = "\n" + string(e.stack)
+		} else {
+			stacktrace = ""
+		}
+
+		fmt.Fprint(f, message+stacktrace)
+	default:
 		fmt.Fprintf(f, "%"+string(verb), e.err)
 	}
 }

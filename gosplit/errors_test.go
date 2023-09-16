@@ -23,71 +23,74 @@ func goSplitError2() error {
 func TestGoSplitError(t *testing.T) {
 	t.Parallel()
 
-	want := struct {
-		message   string
-		rootFrame string
+	cases := map[string]struct {
+		in   string
+		want string
 	}{
-		message:   "root error",
-		rootFrame: "gosplit_test.goSplitError1",
+		"%v":  {"%v", "root error"},
+		"%#v": {"%#v", "&errors.errorString{s:\"root error\"}"},
+		"%s":  {"%s", "root error"},
+		"%q":  {"%q", "\"root error\""},
+		"%x":  {"%x", "726f6f74206572726f72"},
+		"%X":  {"%X", "726F6F74206572726F72"},
+		"%d":  {"%d", "&{%!d(string=root error)}"},
+		"%Z":  {"%Z", "&{%!Z(string=root error)}"},
 	}
 
-	err := goSplitError1()
-	message := fmt.Sprintf("%v", err)
-	detailed := fmt.Sprintf("%+v", err)
-	if message != want.message {
-		t.Errorf("message = %#v, want %#v", message, want.message)
-	}
-	if ok := strings.HasPrefix(detailed, want.message); !ok {
-		t.Errorf("detailed = %#v, want HasPrefix(detailed, %#v)", detailed, want.message)
-	}
-	if strings.Count(detailed, want.rootFrame) != 1 {
-		t.Errorf("detailed = %#v, want Count(detailed, %#v) == 1", detailed, want.rootFrame)
+	for name, tt := range cases {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			err := goSplitError1()
+			got := fmt.Sprintf(tt.in, err)
+			if tt.want != got {
+				t.Errorf("fmt.Sprintf(%#v) = %#v, want %#v", tt.in, got, tt.want)
+			}
+		})
 	}
 }
 
-func TestGoSplitErrorNested(t *testing.T) {
+func TestGoSplitErrorStack(t *testing.T) {
 	t.Parallel()
 
 	want := struct {
-		message   string
-		rootFrame string
+		messagePrefix string
+		goReprPrefix  string
+		frames        []string
 	}{
-		message:   "nested error: root error",
-		rootFrame: "gosplit_test.goSplitError1",
+		messagePrefix: "nested error: root error",
+		goReprPrefix:  "&fmt.wrapError{msg:\"nested error: root error\", err:",
+		frames:        []string{"gosplit_test.goSplitError2", "gosplit_test.goSplitError1"},
 	}
 
 	err := goSplitError2()
-	message := fmt.Sprintf("%v", err)
 	detailed := fmt.Sprintf("%+v", err)
-	if message != want.message {
-		t.Errorf("message = %#v, want %#v", message, want.message)
+	goReprDetailed := fmt.Sprintf("%#+v", err)
+	if ok := strings.HasPrefix(detailed, want.messagePrefix); !ok {
+		t.Errorf("detailed = %#v, want HasPrefix(detailed, %#v)", detailed, want.messagePrefix)
 	}
-	if ok := strings.HasPrefix(detailed, want.message); !ok {
-		t.Errorf("detailed = %#v, want HasPrefix(detailed, %#v)", detailed, want.message)
+	if ok := strings.HasPrefix(goReprDetailed, want.goReprPrefix); !ok {
+		t.Errorf("goReprDetailed = %#v, want HasPrefix(goReprDetailed, %#v)", goReprDetailed, want.goReprPrefix)
 	}
-	if strings.Count(detailed, want.rootFrame) != 1 {
-		t.Errorf("detailed = %#v, want Count(detailed, %#v) == 1", detailed, want.rootFrame)
+	for _, frame := range want.frames {
+		if strings.Count(detailed, frame) != 1 {
+			t.Errorf("detailed = %#v, want Count(detailed, %#v) == 1", detailed, frame)
+		}
+		if strings.Count(goReprDetailed, frame) != 1 {
+			t.Errorf("goReprDetailed = %#v, want Count(goReprDetailed, %#v) == 1", goReprDetailed, frame)
+		}
 	}
 }
 
 func TestGoSplitErrorIs(t *testing.T) {
 	t.Parallel()
 
-	want := errors.New("an error")
-
-	err := gosplit.GoSplitErrorf("TestGoSplitErrorIs: %w", want)
+	rootErr := errors.New("an error")
+	err := gosplit.GoSplitErrorf("TestGoSplitErrorIs: %w", rootErr)
 	if ok := errors.Is(err, gosplit.GoSplitErr); !ok {
-		t.Errorf("errors.Is() should return true")
+		t.Errorf("errors.Is(gosplit.GoSplitErr) should return true")
 	}
-}
-
-func TestGoSplitErrorUnwrap(t *testing.T) {
-	t.Parallel()
-
-	want := errors.New("an error")
-
-	err := gosplit.GoSplitErrorf("TestGoSplitErrorUnwrap: %w", want)
-	if ok := errors.Is(err, want); !ok {
-		t.Errorf("errors.Is() should return true")
+	if ok := errors.Is(err, rootErr); !ok {
+		t.Errorf("errors.Is(rootErr) should return true")
 	}
 }
