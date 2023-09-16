@@ -136,7 +136,7 @@ func (g *GoSplit) ByLines(nLines int) error {
 		}
 	}
 
-	if err := g.byLinesInternal(rFile, nLines); err != nil {
+	if err := g.doByLines(rFile, nLines); err != nil {
 		return err
 	}
 
@@ -172,7 +172,7 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 		return nil
 	}
 
-	if err := g.byNumberInternal(rFile, fileSize, nNumber); err != nil {
+	if err := g.doByNumber(rFile, fileSize, nNumber); err != nil {
 		return err
 	}
 
@@ -201,7 +201,7 @@ func (g *GoSplit) ByBytes(nBytes int64) error {
 		}
 	}
 
-	if err := g.byBytesInternal(rFile, nBytes); err != nil {
+	if err := g.doByBytes(rFile, nBytes); err != nil {
 		return err
 	}
 
@@ -253,8 +253,8 @@ func (g *GoSplit) generateOutFilePath(number int) (string, error) {
 	return outFilePath, nil
 }
 
-// byLinesInternal splits the content from io.Reader by nLines.
-func (g *GoSplit) byLinesInternal(r io.Reader, nLines int) error {
+// doByLines splits the content from io.Reader by nLines.
+func (g *GoSplit) doByLines(r io.Reader, nLines int) error {
 	scanner := bufio.NewScanner(r)
 
 OuterLoop:
@@ -287,8 +287,8 @@ OuterLoop:
 	return nil
 }
 
-// byNumberInternal splits the content from io.Reader into nNumber files.
-func (g *GoSplit) byNumberInternal(r io.Reader, fileSize int64, nNumber int) error {
+// doByNumber splits the content from io.Reader into nNumber files.
+func (g *GoSplit) doByNumber(r io.Reader, fileSize int64, nNumber int) error {
 	chunkSize := fileSize / int64(nNumber)
 
 	for i := 0; i < nNumber; i++ {
@@ -324,8 +324,8 @@ func (g *GoSplit) byNumberInternal(r io.Reader, fileSize int64, nNumber int) err
 	return nil
 }
 
-// byBytesInternal splits the content from io.Reader by nBytes.
-func (g *GoSplit) byBytesInternal(r io.Reader, nBytes int64) error {
+// doByBytes splits the content from io.Reader by nBytes.
+func (g *GoSplit) doByBytes(r io.Reader, nBytes int64) error {
 	for i := 0; ; i++ {
 		outFilePath, err := g.generateOutFilePath(i)
 		if err != nil {
