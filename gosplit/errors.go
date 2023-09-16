@@ -12,8 +12,8 @@ type goSplitError struct {
 	stack []byte
 }
 
-// GoSplitErr represents a goSplitError value for errors.Is().
-var GoSplitErr *goSplitError
+// ErrGoSplit represents a goSplitError value for errors.Is().
+var ErrGoSplit *goSplitError
 
 // GoSplitErrorf returns a new goSplitError.
 func GoSplitErrorf(format string, a ...any) error {

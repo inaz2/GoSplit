@@ -87,8 +87,8 @@ func TestGoSplitErrorIs(t *testing.T) {
 
 	rootErr := errors.New("an error")
 	err := gosplit.GoSplitErrorf("TestGoSplitErrorIs: %w", rootErr)
-	if ok := errors.Is(err, gosplit.GoSplitErr); !ok {
-		t.Errorf("errors.Is(gosplit.GoSplitErr) should return true")
+	if ok := errors.Is(err, gosplit.ErrGoSplit); !ok {
+		t.Errorf("errors.Is(gosplit.ErrGoSplit) should return true")
 	}
 	if ok := errors.Is(err, rootErr); !ok {
 		t.Errorf("errors.Is(rootErr) should return true")
