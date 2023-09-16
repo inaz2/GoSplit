@@ -6,46 +6,46 @@ import (
 	"runtime/debug"
 )
 
-// GoSplitError represents error and stacktrace.
-type GoSplitError struct {
+// goSplitError represents error and stacktrace.
+type goSplitError struct {
 	err   error
 	stack []byte
 }
 
-// GoSplitErr represents a GoSplitError value for errors.Is().
-var GoSplitErr *GoSplitError
+// GoSplitErr represents a goSplitError value for errors.Is().
+var GoSplitErr *goSplitError
 
-// GoSplitErrorf returns a new GoSplitError.
+// GoSplitErrorf returns a new goSplitError.
 func GoSplitErrorf(format string, a ...any) error {
 	err := fmt.Errorf(format, a...)
 
-	var t *GoSplitError
+	var t *goSplitError
 	if errors.As(err, &t) {
 		// keep original stacktrace
-		return &GoSplitError{err: err, stack: t.stack}
+		return &goSplitError{err: err, stack: t.stack}
 	} else {
-		return &GoSplitError{err: err, stack: debug.Stack()}
+		return &goSplitError{err: err, stack: debug.Stack()}
 	}
 }
 
 // Error implemenrts error.Error.
-func (e *GoSplitError) Error() string {
+func (e *goSplitError) Error() string {
 	return e.err.Error()
 }
 
-// Is returns true if target is GoSplitError.
-func (e *GoSplitError) Is(target error) bool {
-	_, ok := target.(*GoSplitError)
+// Is returns true if target is goSplitError.
+func (e *goSplitError) Is(target error) bool {
+	_, ok := target.(*goSplitError)
 	return ok
 }
 
 // Unwrap returns the wrapped error.
-func (e *GoSplitError) Unwrap() error {
+func (e *goSplitError) Unwrap() error {
 	return e.err
 }
 
 // Format implements fmt.Formatter, implemented "%+v" with stacktrace.
-func (e *GoSplitError) Format(f fmt.State, verb rune) {
+func (e *goSplitError) Format(f fmt.State, verb rune) {
 	switch verb {
 	case 'v':
 		if f.Flag('+') {
