@@ -61,7 +61,7 @@ func (g *GoSplit) ParseSize(strSize string) (int64, error) {
 		return 0, GoSplitErrorf("invalid number of bytes: %#v", strSize)
 	}
 
-	x, err := strconv.ParseInt(string(m[1]), 10, 64)
+	x, err := strconv.ParseInt(m[1], 10, 64)
 	if err != nil {
 		return 0, GoSplitErrorf("invalid number of bytes: %#v", strSize)
 	}
