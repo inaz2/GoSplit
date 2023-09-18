@@ -415,3 +415,30 @@ func TestParseSize(t *testing.T) {
 		})
 	}
 }
+
+func TestDirectoryError(t *testing.T) {
+	t.Parallel()
+
+	filePath := "testdata"
+	prefix := "TestDirectoryError-"
+	outDir := t.TempDir()
+	nLines := 10
+	nNumber := 4
+	nBytes := int64(512)
+
+	g := gosplit.New(filePath, prefix)
+	g.SetOutDir(outDir)
+
+	err := g.ByLines(nLines)
+	if err == nil {
+		t.Errorf("ByLines() should be error")
+	}
+	err = g.ByNumber(nNumber)
+	if err == nil {
+		t.Errorf("ByNumber() should be error")
+	}
+	err = g.ByBytes(nBytes)
+	if err == nil {
+		t.Errorf("ByBytes() should be error")
+	}
+}
