@@ -158,6 +158,15 @@ func (g *GoSplit) ByNumber(nNumber int) error {
 		}
 		defer f.Close()
 
+		fi, err := f.Stat()
+		if err != nil {
+			return GoSplitErrorf("failed to stat: %w", err)
+		}
+		mode := fi.Mode()
+		if !mode.IsRegular() {
+			return GoSplitErrorf("cannot determine file size")
+		}
+
 		rFile = f
 	}
 
@@ -208,14 +217,14 @@ func (g *GoSplit) ByBytes(nBytes int64) error {
 
 // checkFileSize returns fileSize with checking disk free space for output files.
 func (g *GoSplit) checkFileSize(rFile *os.File) (int64, error) {
-	fileInfo, err := rFile.Stat()
+	fi, err := rFile.Stat()
 	if err != nil {
 		return 0, GoSplitErrorf("failed to stat: %w", err)
 	}
-	if fileInfo.IsDir() {
-		return 0, GoSplitErrorf("%v: is a directory", rFile.Name())
+	if fi.IsDir() {
+		return 0, GoSplitErrorf("is a directory")
 	}
-	fileSize := fileInfo.Size()
+	fileSize := fi.Size()
 
 	freeBytesAvailable, err := getDiskFreeSpace(g.outDir)
 	if err != nil {
