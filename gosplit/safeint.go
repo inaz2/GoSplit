@@ -13,11 +13,6 @@ func safeMulInt64(x int64, y int64) (int64, error) {
 func safePowInt64(b int64, k int64) (int64, error) {
 	var err error
 
-	// b**0 == 1
-	if k == 0 {
-		return 1, nil
-	}
-
 	// b**(-k) == 1 / (b**k)
 	if k < 0 {
 		d, err := safePowInt64(b, -k)
@@ -31,7 +26,6 @@ func safePowInt64(b int64, k int64) (int64, error) {
 		return result, nil
 	}
 
-	// Here k >= 1, so the result is multiplied by b at least once.
 	result := int64(1)
 	x := b
 	for {
