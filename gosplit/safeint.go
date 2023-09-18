@@ -21,7 +21,11 @@ func safePowInt64(b int64, k int64) (int64, error) {
 		case 1:
 			return 1, nil
 		case -1:
-			return (-1) * (-k), nil
+			if k&1 == 1 {
+				return -1, nil
+			} else {
+				return 1, nil
+			}
 		default:
 			return 0, nil
 		}
