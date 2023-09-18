@@ -1,39 +1,40 @@
 package gosplit
 
 // safeMulInt64 return x*y with checking integer overflow
-func safeMulInt64(x int64, y int64) (int64, error) {
+func safeMulInt64(x int64, y int64) (int64, bool) {
 	z := x * y
 	if y != 0 && z/y != x {
-		return 0, GoSplitErrorf("integer overflow occured: %#v * %#v -> %#v", x, y, z)
+		// integer overflow occured
+		return 0, false
 	}
-	return z, nil
+	return z, true
 }
 
 // safePowInt64 returns b**k with checking integer overflow
-func safePowInt64(b int64, k int64) (int64, error) {
-	var err error
+func safePowInt64(b int64, k int64) (int64, bool) {
+	var ok bool
 
 	if k < 0 {
-		return 0, nil
+		return 0, true
 	}
 
 	result := int64(1)
 	x := b
 	for {
 		if k&1 == 1 {
-			result, err = safeMulInt64(result, x)
-			if err != nil {
-				return 0, err
+			result, ok = safeMulInt64(result, x)
+			if !ok {
+				return 0, false
 			}
 		}
 		k >>= 1
 		if k <= 0 {
 			break
 		}
-		x, err = safeMulInt64(x, x)
-		if err != nil {
-			return 0, err
+		x, ok = safeMulInt64(x, x)
+		if !ok {
+			return 0, false
 		}
 	}
-	return result, nil
+	return result, true
 }
