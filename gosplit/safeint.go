@@ -1,6 +1,6 @@
 package gosplit
 
-// safeMulInt64 return x*y with checking integer overflow
+// safeMulInt64 return x*y with checking integer overflow.
 func safeMulInt64(x int64, y int64) (int64, error) {
 	z := x * y
 	if y != 0 && z/y != x {
@@ -9,25 +9,29 @@ func safeMulInt64(x int64, y int64) (int64, error) {
 	return z, nil
 }
 
-// safePowInt64 returns b**k with checking integer overflow
+// safePowInt64 returns b**k with checking integer overflow.
 func safePowInt64(b int64, k int64) (int64, error) {
 	var err error
 
-	switch {
-	case b == 1:
+	// b**0 == 1
+	if k == 0 {
 		return 1, nil
-	case b == 0 && k > 0:
-		return 0, nil
-	case b == 0 && k < 0:
-		return 0, GoSplitErrorf("division by zero: 0 ** %#v", k)
-	case b == -1 && k > 0:
-		return (-1) * k, nil
-	case b == -1 && k < 0:
-		return (-1) * (-k), nil
-	case k < 0:
-		return 0, nil
 	}
 
+	// b**(-k) == 1 / (b**k)
+	if k < 0 {
+		d, err := safePowInt64(b, -k)
+		if err != nil {
+			return 0, err
+		}
+		if d == 0 {
+			return 0, GoSplitErrorf("division by zero: 0 ** %#v", k)
+		}
+		result := 1 / d
+		return result, nil
+	}
+
+	// Here k >= 1, so the result is multiplied by b at least once.
 	result := int64(1)
 	x := b
 	for {
