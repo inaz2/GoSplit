@@ -13,17 +13,18 @@ func safeMulInt64(x int64, y int64) (int64, error) {
 func safePowInt64(b int64, k int64) (int64, error) {
 	var err error
 
-	// b**(-k) == 1 / (b**k)
 	if k < 0 {
-		d, err := safePowInt64(b, -k)
-		if err != nil {
-			return 0, err
-		}
-		if d == 0 {
+		// b**k == 1 / (b**(-k))
+		switch b {
+		case 0:
 			return 0, GoSplitErrorf("division by zero: 0 ** %#v", k)
+		case 1:
+			return 1, nil
+		case -1:
+			return (-1) * (-k), nil
+		default:
+			return 0, nil
 		}
-		result := 1 / d
-		return result, nil
 	}
 
 	result := int64(1)
