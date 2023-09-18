@@ -212,6 +212,9 @@ func (g *GoSplit) checkFileSize(rFile *os.File) (int64, error) {
 	if err != nil {
 		return 0, GoSplitErrorf("failed to stat: %w", err)
 	}
+	if fileInfo.IsDir() {
+		return 0, GoSplitErrorf("%v: is a directory", rFile.Name())
+	}
 	fileSize := fileInfo.Size()
 
 	freeBytesAvailable, err := getDiskFreeSpace(g.outDir)
