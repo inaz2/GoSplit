@@ -1,6 +1,6 @@
 package gosplit
 
-// safeMulInt64 return x*y with checking integer overflow.
+// safeMulInt64 returns x*y with checking integer overflow.
 func safeMulInt64(x int64, y int64) (int64, error) {
 	z := x * y
 	if y != 0 && z/y != x {
