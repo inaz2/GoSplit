@@ -6,46 +6,59 @@ import (
 	"runtime/debug"
 )
 
-// errorWithStack represents kind, error and stacktrace.
-type errorWithStack struct {
+// ErrorWithStack represents error and stacktrace.
+type ErrorWithStack struct {
 	err   error
 	stack []byte
 }
 
-// ErrGoSplit represents a general GoSplit error.
-var ErrGoSplit = errors.New("gosplit")
-
-// GoSplitErrorf returns a new errorWithStack with ErrGoSplit.
-func GoSplitErrorf(format string, a ...any) error {
-	err := fmt.Errorf(format, a...)
-	err = fmt.Errorf("%w: %w", ErrGoSplit, err)
-
+// WrapWithStack returns a new ErrorWithStack for err.
+func WrapWithStack(err error) error {
 	var stack []byte
-	var e *errorWithStack
+	var e *ErrorWithStack
 	if errors.As(err, &e) {
 		// keep original stacktrace
 		stack = e.stack
 	} else {
 		stack = debug.Stack()
 	}
+	return &ErrorWithStack{err: err, stack: stack}
+}
 
-	return &errorWithStack{err: err, stack: stack}
+// ErrGoSplit represents a general GoSplit error.
+var ErrGoSplit = errors.New("gosplit")
+
+// GoSplitErrorf returns a new ErrorWithStack for a error joined with ErrGoSplit.
+func GoSplitErrorf(format string, a ...any) error {
+	e := fmt.Errorf(format, a...)
+	e = fmt.Errorf("%w: %w", ErrGoSplit, e)
+	return WrapWithStack(e)
 }
 
 // Error implemenrts error.Error.
-func (e *errorWithStack) Error() string {
+func (e *ErrorWithStack) Error() string {
 	return e.err.Error()
 }
 
 // Unwrap returns the wrapped errors.
-func (e *errorWithStack) Unwrap() error {
+func (e *ErrorWithStack) Unwrap() error {
 	return e.err
 }
 
+// GoString implemenrts fmt.GoStringer.
+func (e *ErrorWithStack) GoString() string {
+	return fmt.Sprintf("&gosplit.ErrorWithStack{err: %#v, stack: %#v}", e.err, e.stack)
+}
+
 // Format implements fmt.Formatter, extending "%+v" as error with stacktrace.
-func (e *errorWithStack) Format(f fmt.State, verb rune) {
-	format := fmt.FormatString(f, verb)
-	msg := fmt.Sprintf(format, e.err)
+func (e *ErrorWithStack) Format(f fmt.State, verb rune) {
+	var msg string
+	if verb == 'v' && f.Flag('#') {
+		msg = e.GoString()
+	} else {
+		format := fmt.FormatString(f, verb)
+		msg = fmt.Sprintf(format, e.err)
+	}
 	if verb == 'v' && f.Flag('+') {
 		msg += "\n" + string(e.stack)
 	}
