@@ -3,6 +3,7 @@ package gosplit
 
 import (
 	"inaz2/GoSplit/internal/gerrors"
+	"inaz2/GoSplit/internal/safeint"
 
 	"bufio"
 	"errors"
@@ -105,13 +106,13 @@ func (g *GoSplit) ParseSize(strSize string) (int64, error) {
 		if !ok {
 			return 0, GoSplitErrorf("invalid number of bytes: %#v", strSize)
 		}
-		multiplier, err = safePowInt64(base, exponent)
+		multiplier, err = safeint.PowInt64(base, exponent)
 		if err != nil {
 			return 0, GoSplitErrorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
 		}
 	}
 
-	n, err := safeMulInt64(x, multiplier)
+	n, err := safeint.MulInt64(x, multiplier)
 	if err != nil {
 		return 0, GoSplitErrorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
 	}
