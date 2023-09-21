@@ -31,16 +31,16 @@ func TestErrGoSplit(t *testing.T) {
 		want         string
 		expectPrefix bool
 	}{
-		"%v":   {"%v", "failed to something: root error", false},
-		"%+v":  {"%+v", "failed to something: root error\n", true},
-		"%#v":  {"%#v", "&fmt.wrapError{msg:\"failed to something: root error\", err:", true},
-		"%#+v": {"%#+v", "&fmt.wrapError{msg:\"failed to something: root error\", err:", true},
-		"%s":   {"%s", "failed to something: root error", false},
-		"%q":   {"%q", "\"failed to something: root error\"", false},
-		"%x":   {"%x", "6661696c656420746f20736f6d657468696e673a20726f6f74206572726f72", false},
-		"%X":   {"%X", "6661696C656420746F20736F6D657468696E673A20726F6F74206572726F72", false},
-		"%d":   {"%d", "&{%!d(string=failed to something: root error) ", true},
-		"%Z":   {"%Z", "&{%!Z(string=failed to something: root error) %!Z(*errors.errorString=&{root error})}", false},
+		"%v":   {"%v", "gosplit: failed to something: root error", false},
+		"%+v":  {"%+v", "gosplit: failed to something: root error\n", true},
+		"%#v":  {"%#v", "&fmt.wrapErrors{msg:\"gosplit: failed to something: root error\", ", true},
+		"%#+v": {"%#+v", "&fmt.wrapErrors{msg:\"gosplit: failed to something: root error\", ", true},
+		"%s":   {"%s", "gosplit: failed to something: root error", false},
+		"%q":   {"%q", "\"gosplit: failed to something: root error\"", false},
+		"%x":   {"%x", "676f73706c69743a206661696c656420746f20736f6d657468696e673a20726f6f74206572726f72", false},
+		"%X":   {"%X", "676F73706C69743A206661696C656420746F20736F6D657468696E673A20726F6F74206572726F72", false},
+		"%d":   {"%d", "&{%!d(string=gosplit: failed to something: root error) ", true},
+		"%Z":   {"%Z", "&{%!Z(string=gosplit: failed to something: root error) ", true},
 	}
 
 	for name, tt := range cases {
