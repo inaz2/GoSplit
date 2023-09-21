@@ -50,7 +50,7 @@ func TestErrGoSplit(t *testing.T) {
 			got := fmt.Sprintf(tt.in, err)
 			if tt.expectPrefix {
 				if ok := strings.HasPrefix(got, tt.want); !ok {
-					t.Errorf("fmt.Sprintf(%#v) = %#v, want %#v", tt.in, got, tt.want)
+					t.Errorf("HasPrefix(%#v, %#v) = false, want true", got, tt.want)
 				}
 			} else {
 				if tt.want != got {
@@ -71,11 +71,11 @@ func TestErrGoSplitStack(t *testing.T) {
 	goReprDetailed := fmt.Sprintf("%#+v", err)
 
 	for _, frame := range frames {
-		if strings.Count(detailed, frame) != 1 {
-			t.Errorf("detailed = %#v, want Count(detailed, %#v) == 1", detailed, frame)
+		if got := strings.Count(detailed, frame); got != 1 {
+			t.Errorf("Count(%#v, %#v) = %#v, want 1", detailed, frame, got)
 		}
-		if strings.Count(goReprDetailed, frame) != 1 {
-			t.Errorf("goReprDetailed = %#v, want Count(goReprDetailed, %#v) == 1", goReprDetailed, frame)
+		if got := strings.Count(goReprDetailed, frame); got != 1 {
+			t.Errorf("Count(%#v, %#v) = %#v, want 1", goReprDetailed, frame, got)
 		}
 	}
 }
@@ -86,12 +86,12 @@ func TestErrGoSplitIs(t *testing.T) {
 	err := errGoSplit1()
 
 	if ok := errors.Is(errRoot, gosplit.ErrGoSplit); ok {
-		t.Errorf("errors.Is(errRoot, gosplit.ErrGoSplit) should return false")
+		t.Errorf("errors.Is(errRoot, gosplit.ErrGoSplit) = true, want false")
 	}
 	if ok := errors.Is(err, gosplit.ErrGoSplit); !ok {
-		t.Errorf("errors.Is(err, gosplit.ErrGoSplit) should return true")
+		t.Errorf("errors.Is(err, gosplit.ErrGoSplit) = false, want true")
 	}
 	if ok := errors.Is(err, errRoot); !ok {
-		t.Errorf("errors.Is(err, errRoot) should return true")
+		t.Errorf("errors.Is(err, errRoot) = false, want true")
 	}
 }
