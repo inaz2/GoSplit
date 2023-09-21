@@ -107,7 +107,7 @@ func TestByLinesInvalidNLines(t *testing.T) {
 	g.SetOutDir(outDir)
 	err := g.ByLines(nLines)
 	if err == nil {
-		t.Errorf("non-positive nLines should be error")
+		t.Errorf("ByLines(%#v) should be error", nLines)
 	}
 }
 
@@ -187,7 +187,7 @@ func TestByNumberStdin(t *testing.T) {
 	g.SetOutDir(outDir)
 	err := g.ByNumber(nNumber)
 	if err == nil {
-		t.Errorf("ByNumber() with stdin should be error")
+		t.Errorf("ByNumber() with STDIN should be error")
 	}
 }
 
@@ -203,7 +203,7 @@ func TestByNumberInvalidNBytes(t *testing.T) {
 	g.SetOutDir(outDir)
 	err := g.ByNumber(nNumber)
 	if err == nil {
-		t.Errorf("non-positive nNumber should be error")
+		t.Errorf("ByNumber(%#v) should be error", nNumber)
 	}
 }
 
@@ -273,7 +273,7 @@ func TestByBytesInvalidNBytes(t *testing.T) {
 	g.SetOutDir(outDir)
 	err := g.ByBytes(nBytes)
 	if err == nil {
-		t.Errorf("non-positive nBytes should be error")
+		t.Errorf("ByBytes(%#v) should be error", nBytes)
 	}
 }
 
@@ -431,14 +431,14 @@ func TestDirectoryError(t *testing.T) {
 
 	err := g.ByLines(nLines)
 	if err == nil {
-		t.Errorf("ByLines() should be error")
+		t.Errorf("ByLines() with a directory should be error")
 	}
 	err = g.ByNumber(nNumber)
 	if err == nil {
-		t.Errorf("ByNumber() should be error")
+		t.Errorf("ByNumber() with a directory should be error")
 	}
 	err = g.ByBytes(nBytes)
 	if err == nil {
-		t.Errorf("ByBytes() should be error")
+		t.Errorf("ByBytes() with a directory should be error")
 	}
 }
