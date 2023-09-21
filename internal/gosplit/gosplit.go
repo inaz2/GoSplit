@@ -2,7 +2,10 @@
 package gosplit
 
 import (
+	"inaz2/GoSplit/internal/gerrors"
+
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -10,6 +13,14 @@ import (
 	"regexp"
 	"strconv"
 )
+
+// ErrGoSplit represents a error in this package.
+var ErrGoSplit = errors.New("gosplit")
+
+// GoSplitErrorf returns a new error with ErrGoSplit.
+func GoSplitErrorf(format string, a ...any) error {
+	return gerrors.Errorf(ErrGoSplit, format, a...)
+}
 
 // GoSplit provides the methods for splitting the file.
 type GoSplit struct {
