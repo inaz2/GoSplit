@@ -1,7 +1,7 @@
 package main
 
 import (
-	"inaz2/GoSplit/gosplit"
+	"inaz2/GoSplit/internal/gosplit"
 
 	"flag"
 	"fmt"

@@ -2,7 +2,11 @@
 package gosplit
 
 import (
+	"inaz2/GoSplit/internal/gerrors"
+	"inaz2/GoSplit/internal/safeint"
+
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -10,6 +14,14 @@ import (
 	"regexp"
 	"strconv"
 )
+
+// ErrGoSplit represents a error in this package.
+var ErrGoSplit = errors.New("gosplit")
+
+// GoSplitErrorf returns a new error with ErrGoSplit.
+func GoSplitErrorf(format string, a ...any) error {
+	return gerrors.Errorf(ErrGoSplit, format, a...)
+}
 
 // GoSplit provides the methods for splitting the file.
 type GoSplit struct {
@@ -94,13 +106,13 @@ func (g *GoSplit) ParseSize(strSize string) (int64, error) {
 		if !ok {
 			return 0, GoSplitErrorf("invalid number of bytes: %#v", strSize)
 		}
-		multiplier, err = safePowInt64(base, exponent)
+		multiplier, err = safeint.PowInt64(base, exponent)
 		if err != nil {
 			return 0, GoSplitErrorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
 		}
 	}
 
-	n, err := safeMulInt64(x, multiplier)
+	n, err := safeint.MulInt64(x, multiplier)
 	if err != nil {
 		return 0, GoSplitErrorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
 	}

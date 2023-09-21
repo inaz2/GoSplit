@@ -1,10 +1,12 @@
-package gosplit
+package safeint_test
 
 import (
+	"inaz2/GoSplit/internal/safeint"
+
 	"testing"
 )
 
-func Test_safeMulInt64(t *testing.T) {
+func TestMulInt64(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
@@ -31,7 +33,7 @@ func Test_safeMulInt64(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			got, err := safeMulInt64(tt.in[0], tt.in[1])
+			got, err := safeint.MulInt64(tt.in[0], tt.in[1])
 			if tt.expectErr && err == nil {
 				t.Fatal("want err")
 			}
@@ -39,13 +41,13 @@ func Test_safeMulInt64(t *testing.T) {
 				t.Fatal("not want err:", err)
 			}
 			if tt.want != got {
-				t.Errorf("safeMulInt64(%#v, %#v) = %#v, want %#v", tt.in[0], tt.in[1], got, tt.want)
+				t.Errorf("MulInt64(%#v, %#v) = %#v, want %#v", tt.in[0], tt.in[1], got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_safePowInt64(t *testing.T) {
+func TestPowInt64(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
@@ -78,7 +80,7 @@ func Test_safePowInt64(t *testing.T) {
 		tt := tt
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			got, err := safePowInt64(tt.in[0], tt.in[1])
+			got, err := safeint.PowInt64(tt.in[0], tt.in[1])
 			if tt.expectErr && err == nil {
 				t.Fatal("want err")
 			}
@@ -86,7 +88,7 @@ func Test_safePowInt64(t *testing.T) {
 				t.Fatal("not want err:", err)
 			}
 			if tt.want != got {
-				t.Errorf("safePowInt64(%#v, %#v) = %#v, want %#v", tt.in[0], tt.in[1], got, tt.want)
+				t.Errorf("PowInt64(%#v, %#v) = %#v, want %#v", tt.in[0], tt.in[1], got, tt.want)
 			}
 		})
 	}
