@@ -1,7 +1,7 @@
 package gosplit_test
 
 import (
-	"inaz2/GoSplit/gosplit"
+	"inaz2/GoSplit/internal/gosplit"
 
 	"errors"
 	"fmt"
