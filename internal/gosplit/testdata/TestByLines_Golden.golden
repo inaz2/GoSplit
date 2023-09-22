@@ -1,4 +1,4 @@
--- TestByLines-aa --
+-- TestByLines_Golden-aa --
 # The Go Programming Language
 
 Go is an open source programming language that makes it easy to build simple,
@@ -9,7 +9,7 @@ reliable, and efficient software.
 
 Our canonical Git repository is located at https://go.googlesource.com/go.
 There is a mirror of the repository at https://github.com/golang/go.
--- TestByLines-ab --
+-- TestByLines_Golden-ab --
 
 Unless otherwise noted, the Go source files are distributed under the
 BSD-style license found in the LICENSE file.
@@ -20,7 +20,7 @@ BSD-style license found in the LICENSE file.
 
 Official binary distributions are available at https://go.dev/dl/.
 
--- TestByLines-ac --
+-- TestByLines_Golden-ac --
 After downloading a binary release, visit https://go.dev/doc/install
 for installation instructions.
 
@@ -31,7 +31,7 @@ operating system and architecture, visit
 https://go.dev/doc/install/source
 for source installation instructions.
 
--- TestByLines-ad --
+-- TestByLines_Golden-ad --
 ### Contributing
 
 Go is the work of thousands of contributors. We appreciate your help!
@@ -42,6 +42,6 @@ Note that the Go project uses the issue tracker for bug reports and
 proposals only. See https://go.dev/wiki/Questions for a list of
 places to ask questions about the Go language.
 
--- TestByLines-ae --
+-- TestByLines_Golden-ae --
 [rf]: https://reneefrench.blogspot.com/
 [cc4-by]: https://creativecommons.org/licenses/by/4.0/

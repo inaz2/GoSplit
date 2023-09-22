@@ -1,3 +1,4 @@
+// Package gerrors implements generalized error with stacktrace.
 package gerrors
 
 import (
@@ -6,19 +7,25 @@ import (
 	"runtime/debug"
 )
 
-// generalizedError represents kind, error and stacktrace.
-type generalizedError struct {
-	kind  error
+// ErrorWithStack represents error and stacktrace.
+type ErrorWithStack struct {
 	err   error
 	stack []byte
 }
 
-// Errorf returns a new generalizedError.
-func Errorf(kind error, format string, a ...any) error {
+// Errorf returns a new errBase error with formatting. The error string of errBase is discarded.
+func Errorf(errBase error, format string, a ...any) error {
 	err := fmt.Errorf(format, a...)
+	return Link(err, errBase)
+}
+
+// Link returns a new error linked to err1. The error string of err1 is discarded.
+func Link(err2 error, err1 error) error {
+	// prepend err1 by zero-length formatting "%.w"
+	err := fmt.Errorf("%.w%w", err1, err2)
 
 	var stack []byte
-	var e *generalizedError
+	var e *ErrorWithStack
 	if errors.As(err, &e) {
 		// keep original stacktrace
 		stack = e.stack
@@ -26,26 +33,26 @@ func Errorf(kind error, format string, a ...any) error {
 		stack = debug.Stack()
 	}
 
-	return &generalizedError{kind: kind, err: err, stack: stack}
+	return &ErrorWithStack{err: err, stack: stack}
 }
 
 // Error implemenrts error.Error.
-func (e *generalizedError) Error() string {
+func (e *ErrorWithStack) Error() string {
 	return e.err.Error()
 }
 
 // Unwrap returns the wrapped errors.
-func (e *generalizedError) Unwrap() []error {
-	return []error{e.kind, e.err}
+func (e *ErrorWithStack) Unwrap() error {
+	return e.err
 }
 
 // GoString implemenrts fmt.GoStringer.
-func (e *generalizedError) GoString() string {
-	return fmt.Sprintf("&gerrors.generalizedError{kind: %#v, err: %#v, stack: %#v}", e.kind, e.err, e.stack)
+func (e *ErrorWithStack) GoString() string {
+	return fmt.Sprintf("&gerrors.ErrorWithStack{err: %#v, stack: %#v}", e.err, e.stack)
 }
 
 // Format implements fmt.Formatter, extending "%+v" as error with stacktrace.
-func (e *generalizedError) Format(f fmt.State, verb rune) {
+func (e *ErrorWithStack) Format(f fmt.State, verb rune) {
 	var msg string
 	if verb == 'v' && f.Flag('#') {
 		msg = e.GoString()

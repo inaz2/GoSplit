@@ -5,48 +5,69 @@ import (
 
 	"errors"
 	"fmt"
+	"io/fs"
 	"strings"
 	"testing"
 )
 
-var errGErrors = errors.New("gerrors")
+// usage in pkg/subpkg
 
-func GErrorsErrorf(format string, a ...any) error {
-	return gerrors.Errorf(errGErrors, format, a...)
+// errSubPkg represents a error in subpkg.
+var errSubPkg = errors.New("subpkg")
+
+// SubPkgErrorf returns a new error with errSubPkg.
+func SubPkgErrorf(format string, a ...any) error {
+	return gerrors.Errorf(errSubPkg, format, a...)
 }
 
-var errRoot = errors.New("root error")
-
-func errorTest1() error {
-	return GErrorsErrorf("failed to something: %w", errRoot)
+// failSubPkg1 returns a error with fs.ErrExist.
+func failSubPkg1() error {
+	return SubPkgErrorf("failed something in fs: %w", fs.ErrExist)
 }
 
-func errorTest2() error {
-	if err := errorTest1(); err != nil {
-		return GErrorsErrorf("failed to errorTest1: %w", err)
+// failSubPkg2 returns a error from failSubPkg1.
+func failSubPkg2() error {
+	if err := failSubPkg1(); err != nil {
+		return SubPkgErrorf("failed to failSubPkg1: %w", err)
 	}
 	return nil
 }
 
-func TestErrGoSplit(t *testing.T) {
+// usage in pkg
+
+// errSubPkg represents a error in pkg.
+var errPkg = errors.New("pkg")
+
+// errSubPkgFailed represents a error from subpkg.
+var errSubPkgFailed = gerrors.Errorf(errPkg, "failed something in subpkg")
+
+// failSubPkg2 returns a error from failSubPkg2.
+func failPkg() error {
+	if err := failSubPkg2(); err != nil {
+		return gerrors.Link(errSubPkgFailed, err)
+	}
+	return nil
+}
+
+func TestFormat(t *testing.T) {
 	t.Parallel()
 
-	err := errorTest1()
+	err := failSubPkg1()
 	cases := map[string]struct {
 		in           string
 		want         string
 		expectPrefix bool
 	}{
-		"%v":   {"%v", "failed to something: root error", false},
-		"%+v":  {"%+v", "failed to something: root error\n", true},
-		"%#v":  {"%#v", "&gerrors.generalizedError{kind: &errors.errorString{s:\"gerrors\"}, err: &fmt.wrapError{msg:\"failed to something: root error\", ", true},
-		"%#+v": {"%#+v", "&gerrors.generalizedError{kind: &errors.errorString{s:\"gerrors\"}, err: &fmt.wrapError{msg:\"failed to something: root error\", ", true},
-		"%s":   {"%s", "failed to something: root error", false},
-		"%q":   {"%q", "\"failed to something: root error\"", false},
-		"%x":   {"%x", "6661696c656420746f20736f6d657468696e673a20726f6f74206572726f72", false},
-		"%X":   {"%X", "6661696C656420746F20736F6D657468696E673A20726F6F74206572726F72", false},
-		"%d":   {"%d", "&{%!d(string=failed to something: root error) ", true},
-		"%Z":   {"%Z", "&{%!Z(string=failed to something: root error) ", true},
+		"%v":   {"%v", "failed something in fs: file already exists", false},
+		"%+v":  {"%+v", "failed something in fs: file already exists\n", true},
+		"%#v":  {"%#v", "&gerrors.ErrorWithStack{err: &fmt.wrapErrors{msg:\"failed something in fs: file already exists\", ", true},
+		"%#+v": {"%#+v", "&gerrors.ErrorWithStack{err: &fmt.wrapErrors{msg:\"failed something in fs: file already exists\", ", true},
+		"%s":   {"%s", "failed something in fs: file already exists", false},
+		"%q":   {"%q", "\"failed something in fs: file already exists\"", false},
+		"%x":   {"%x", "6661696c656420736f6d657468696e6720696e2066733a2066696c6520616c726561647920657869737473", false},
+		"%X":   {"%X", "6661696C656420736F6D657468696E6720696E2066733A2066696C6520616C726561647920657869737473", false},
+		"%d":   {"%d", "&{%!d(string=failed something in fs: file already exists) ", true},
+		"%Z":   {"%Z", "&{%!Z(string=failed something in fs: file already exists) ", true},
 	}
 
 	for name, tt := range cases {
@@ -67,11 +88,11 @@ func TestErrGoSplit(t *testing.T) {
 	}
 }
 
-func TestErrGoSplitStack(t *testing.T) {
+func TestFormat_Stack(t *testing.T) {
 	t.Parallel()
 
-	err := errorTest2()
-	frames := []string{"errors_test.errorTest2", "errors_test.errorTest1"}
+	err := failSubPkg2()
+	frames := []string{"errors_test.failSubPkg2", "errors_test.failSubPkg1"}
 
 	detailed := fmt.Sprintf("%+v", err)
 	goReprDetailed := fmt.Sprintf("%#+v", err)
@@ -86,18 +107,70 @@ func TestErrGoSplitStack(t *testing.T) {
 	}
 }
 
-func TestErrGoSplitIs(t *testing.T) {
+func TestIs(t *testing.T) {
 	t.Parallel()
 
-	err := errorTest1()
+	err := failSubPkg1()
+	if ok := errors.Is(err, errSubPkg); !ok {
+		t.Errorf("errors.Is(err, errSubPkg) = false, want true")
+	}
+	if ok := errors.Is(err, fs.ErrExist); !ok {
+		t.Errorf("errors.Is(err, fs.ErrExist) = false, want true")
+	}
+	if ok := errors.Is(errSubPkg, err); ok {
+		t.Errorf("errors.Is(errSubPkg, err) = true, want false")
+	}
+}
 
-	if ok := errors.Is(errRoot, errGErrors); ok {
-		t.Errorf("errors.Is(errRoot, errGErrors) = true, want false")
+func TestJoin_Format(t *testing.T) {
+	t.Parallel()
+
+	err := failPkg()
+	want := "failed something in subpkg"
+
+	got := fmt.Sprintf("%v", err)
+	if got != want {
+		t.Errorf("got = %#v, want %#v", got, want)
 	}
-	if ok := errors.Is(err, errGErrors); !ok {
-		t.Errorf("errors.Is(err, errGErrors) = false, want true")
+}
+
+func TestJoin_Format_Stack(t *testing.T) {
+	t.Parallel()
+
+	err := failPkg()
+	frames := []string{"errors_test.failPkg", "errors_test.failSubPkg2", "errors_test.failSubPkg1"}
+
+	detailed := fmt.Sprintf("%+v", err)
+	goReprDetailed := fmt.Sprintf("%#+v", err)
+
+	for _, frame := range frames {
+		if got := strings.Count(detailed, frame); got != 1 {
+			t.Errorf("Count(%#v, %#v) = %#v, want 1", detailed, frame, got)
+		}
+		if got := strings.Count(goReprDetailed, frame); got != 1 {
+			t.Errorf("Count(%#v, %#v) = %#v, want 1", goReprDetailed, frame, got)
+		}
 	}
-	if ok := errors.Is(err, errRoot); !ok {
-		t.Errorf("errors.Is(err, errRoot) = false, want true")
+}
+
+func TestJoin_Is(t *testing.T) {
+	t.Parallel()
+
+	err := failPkg()
+
+	if ok := errors.Is(err, errSubPkgFailed); !ok {
+		t.Errorf("errors.Is(err, errSubPkgFailed) = false, want true")
+	}
+	if ok := errors.Is(err, errPkg); !ok {
+		t.Errorf("errors.Is(err, errPkg) = false, want true")
+	}
+	if ok := errors.Is(err, errSubPkg); !ok {
+		t.Errorf("errors.Is(err, errSubPkg) = false, want true")
+	}
+	if ok := errors.Is(err, fs.ErrExist); !ok {
+		t.Errorf("errors.Is(err, fs.ErrExist) = false, want true")
+	}
+	if ok := errors.Is(errSubPkgFailed, err); ok {
+		t.Errorf("errors.Is(errSubPkgFailed, err) = true, want false")
 	}
 }

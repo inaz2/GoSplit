@@ -108,13 +108,15 @@ func (g *GoSplit) ParseSize(strSize string) (int64, error) {
 		}
 		multiplier, err = safeint.PowInt64(base, exponent)
 		if err != nil {
-			return 0, GoSplitErrorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
+			e := GoSplitErrorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
+			return 0, gerrors.Link(e, err)
 		}
 	}
 
 	n, err := safeint.MulInt64(x, multiplier)
 	if err != nil {
-		return 0, GoSplitErrorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
+		e := GoSplitErrorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
+		return 0, gerrors.Link(e, err)
 	}
 
 	if n <= 0 {
