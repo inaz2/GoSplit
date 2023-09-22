@@ -3,11 +3,13 @@
 package gosplit
 
 import (
+	. "inaz2/GoSplit/internal/gerrors"
+
 	"golang.org/x/sys/unix"
 )
 
 // getDiskFreeSpace returns free disk space where dirPath exists.
-func getDiskFreeSpace(dirPath string) (uint64, error) {
+func getDiskFreeSpace(dirPath string) (uint64, Gerror) {
 	var stat unix.Statfs_t
 
 	if err := unix.Statfs(dirPath, &stat); err != nil {
