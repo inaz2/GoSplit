@@ -1,4 +1,4 @@
--- TestByBytes-aa --
+-- TestByBytes_Golden-aa --
 # The Go Programming Language
 
 Go is an open source programming language that makes it easy to build simple,
@@ -11,7 +11,7 @@ Our canonical Git repository is located at https://go.googlesource.com/go.
 There is a mirror of the repository at https://github.com/golang/go.
 
 Unless otherwise noted, the Go source files are distrib
--- TestByBytes-ab --
+-- TestByBytes_Golden-ab --
 uted under the
 BSD-style license found in the LICENSE file.
 
@@ -34,7 +34,7 @@ for source installation instructions.
 ### Contributing
 
 Go is
--- TestByBytes-ac --
+-- TestByBytes_Golden-ac --
  the work of thousands of contributors. We appreciate your help!
 
 To contribute, please read the contribution guidelines at https://go.dev/doc/contribute.

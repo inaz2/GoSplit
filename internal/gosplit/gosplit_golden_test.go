@@ -17,9 +17,9 @@ func init() {
 	flag.BoolVar(&flagUpdate, "update", false, "update golden files")
 }
 
-func testByLinesGoldenTarget(dir string) error {
+func targetTestByLines_Golden(dir string) error {
 	filePath := "testdata/example.txt"
-	prefix := "TestByLines-"
+	prefix := "TestByLines_Golden-"
 	nLines := 10
 
 	g := gosplit.New(filePath, prefix)
@@ -32,9 +32,9 @@ func testByLinesGoldenTarget(dir string) error {
 	return nil
 }
 
-func testByNumberGoldenTarget(dir string) error {
+func targetTestByNumber_Golden(dir string) error {
 	filePath := "testdata/example.txt"
-	prefix := "TestByNumber-"
+	prefix := "TestByNumber_Golden-"
 	nNumber := 4
 
 	g := gosplit.New(filePath, prefix)
@@ -47,9 +47,9 @@ func testByNumberGoldenTarget(dir string) error {
 	return nil
 }
 
-func testByNumberEmptyGoldenTarget(dir string) error {
+func targetTestByNumber_EmptyFile_Golden(dir string) error {
 	filePath := "testdata/empty"
-	prefix := "TestByNumberEmpty-"
+	prefix := "TestByNumber_EmptyFile_Golden-"
 	nNumber := 4
 
 	g := gosplit.New(filePath, prefix)
@@ -62,9 +62,9 @@ func testByNumberEmptyGoldenTarget(dir string) error {
 	return nil
 }
 
-func testByBytesGoldenTarget(dir string) error {
+func targetTestByBytes_Golden(dir string) error {
 	filePath := "testdata/example.txt"
-	prefix := "TestByBytes-"
+	prefix := "TestByBytes_Golden-"
 	nBytes := int64(512)
 
 	g := gosplit.New(filePath, prefix)
@@ -77,50 +77,50 @@ func testByBytesGoldenTarget(dir string) error {
 	return nil
 }
 
-func TestByLinesGolden(t *testing.T) {
+func TestByLines_Golden(t *testing.T) {
 	dir := t.TempDir()
-	if err := testByLinesGoldenTarget(dir); err != nil {
+	if err := targetTestByLines_Golden(dir); err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
 	got := golden.Txtar(t, dir)
-	if diff := golden.Check(t, flagUpdate, "testdata", "TestByLinesGolden", got); diff != "" {
+	if diff := golden.Check(t, flagUpdate, "testdata", "TestByLines_Golden", got); diff != "" {
 		t.Error(diff)
 	}
 }
 
-func TestByNumberGolden(t *testing.T) {
+func TestByNumber_Golden(t *testing.T) {
 	dir := t.TempDir()
-	if err := testByNumberGoldenTarget(dir); err != nil {
+	if err := targetTestByNumber_Golden(dir); err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
 	got := golden.Txtar(t, dir)
-	if diff := golden.Check(t, flagUpdate, "testdata", "TestByNumberGolden", got); diff != "" {
+	if diff := golden.Check(t, flagUpdate, "testdata", "TestByNumber_Golden", got); diff != "" {
 		t.Error(diff)
 	}
 }
 
-func TestByNumberEmptyGolden(t *testing.T) {
+func TestByNumber_EmptyFile_Golden(t *testing.T) {
 	dir := t.TempDir()
-	if err := testByNumberEmptyGoldenTarget(dir); err != nil {
+	if err := targetTestByNumber_EmptyFile_Golden(dir); err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
 	got := golden.Txtar(t, dir)
-	if diff := golden.Check(t, flagUpdate, "testdata", "TestByNumberEmptyGolden", got); diff != "" {
+	if diff := golden.Check(t, flagUpdate, "testdata", "TestByNumber_EmptyFile_Golden", got); diff != "" {
 		t.Error(diff)
 	}
 }
 
-func TestByBytesGolden(t *testing.T) {
+func TestByBytes_Golden(t *testing.T) {
 	dir := t.TempDir()
-	if err := testByBytesGoldenTarget(dir); err != nil {
+	if err := targetTestByBytes_Golden(dir); err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
 	got := golden.Txtar(t, dir)
-	if diff := golden.Check(t, flagUpdate, "testdata", "TestByBytesGolden", got); diff != "" {
+	if diff := golden.Check(t, flagUpdate, "testdata", "TestByBytes_Golden", got); diff != "" {
 		t.Error(diff)
 	}
 }

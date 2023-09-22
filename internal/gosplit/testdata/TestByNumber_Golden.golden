@@ -1,4 +1,4 @@
--- TestByNumber-aa --
+-- TestByNumber_Golden-aa --
 # The Go Programming Language
 
 Go is an open source programming language that makes it easy to build simple,
@@ -8,7 +8,7 @@ reliable, and efficient software.
 *Gopher image by [Renee French][rf], licensed under [Creative Commons 4.0 Attributions license][cc4-by].*
 
 Our canonical Git repository is located at https://
--- TestByNumber-ab --
+-- TestByNumber_Golden-ab --
 go.googlesource.com/go.
 There is a mirror of the repository at https://github.com/golang/go.
 
@@ -22,7 +22,7 @@ BSD-style license found in the LICENSE file.
 Official binary distributions are available at https://go.dev/dl/.
 
 After downloading a binary relea
--- TestByNumber-ac --
+-- TestByNumber_Golden-ac --
 se, visit https://go.dev/doc/install
 for installation instructions.
 
@@ -36,7 +36,7 @@ for source installation instructions.
 ### Contributing
 
 Go is the work of thousands of contributors. We appreciate your help!
--- TestByNumber-ad --
+-- TestByNumber_Golden-ad --
 
 To contribute, please read the contribution guidelines at https://go.dev/doc/contribute.
 

@@ -72,11 +72,11 @@ func TestByLines(t *testing.T) {
 	}
 }
 
-func TestByLinesEmpty(t *testing.T) {
+func TestByLines_EmptyFile(t *testing.T) {
 	t.Parallel()
 
 	filePath := "testdata/empty"
-	prefix := "TestByLinesEmpty-"
+	prefix := "TestByLines_EmptyFile-"
 	outDir := t.TempDir()
 	nLines := 10
 
@@ -95,11 +95,27 @@ func TestByLinesEmpty(t *testing.T) {
 	}
 }
 
-func TestByLinesInvalidNLines(t *testing.T) {
+func TestByLines_Directory(t *testing.T) {
+	t.Parallel()
+
+	filePath := "testdata"
+	prefix := "TestByLines_Directory-"
+	outDir := t.TempDir()
+	nLines := 10
+
+	g := gosplit.New(filePath, prefix)
+	g.SetOutDir(outDir)
+	err := g.ByLines(nLines)
+	if err == nil {
+		t.Errorf("ByLines() with a directory should be error")
+	}
+}
+
+func TestByLines_InvalidNLines(t *testing.T) {
 	t.Parallel()
 
 	filePath := "testdata/example.txt"
-	prefix := "TestByLinesInvalidNLines-"
+	prefix := "TestByLines_InvalidNLines-"
 	outDir := t.TempDir()
 	nLines := 0
 
@@ -143,11 +159,11 @@ func TestByNumber(t *testing.T) {
 	}
 }
 
-func TestByNumberEmpty(t *testing.T) {
+func TestByNumber_EmptyFile(t *testing.T) {
 	t.Parallel()
 
 	filePath := "testdata/empty"
-	prefix := "TestByNumberEmpty-"
+	prefix := "TestByNumber_EmptyFile-"
 	outDir := t.TempDir()
 	nNumber := 4
 	outFiles := []struct {
@@ -175,11 +191,27 @@ func TestByNumberEmpty(t *testing.T) {
 	}
 }
 
-func TestByNumberStdin(t *testing.T) {
+func TestByNumber_Directory(t *testing.T) {
+	t.Parallel()
+
+	filePath := "testdata"
+	prefix := "TestByNumber_Directory-"
+	outDir := t.TempDir()
+	nNumber := 4
+
+	g := gosplit.New(filePath, prefix)
+	g.SetOutDir(outDir)
+	err := g.ByNumber(nNumber)
+	if err == nil {
+		t.Errorf("ByNumber() with a directory should be error")
+	}
+}
+
+func TestByNumber_Stdin(t *testing.T) {
 	t.Parallel()
 
 	filePath := "-"
-	prefix := "TestByNumberEmpty-"
+	prefix := "TestByNumber_Stdin-"
 	outDir := t.TempDir()
 	nNumber := 4
 
@@ -191,11 +223,11 @@ func TestByNumberStdin(t *testing.T) {
 	}
 }
 
-func TestByNumberInvalidNBytes(t *testing.T) {
+func TestByNumber_InvalidNBytes(t *testing.T) {
 	t.Parallel()
 
 	filePath := "testdata/example.txt"
-	prefix := "TestByNumberInvalidNBytes-"
+	prefix := "TestByNumber_InvalidNBytes-"
 	outDir := t.TempDir()
 	nNumber := 0
 
@@ -238,11 +270,11 @@ func TestByBytes(t *testing.T) {
 	}
 }
 
-func TestByBytesEmpty(t *testing.T) {
+func TestByBytes_EmptyFile(t *testing.T) {
 	t.Parallel()
 
 	filePath := "testdata/empty"
-	prefix := "TestByBytesEmpty-"
+	prefix := "TestByBytes_EmptyFile-"
 	outDir := t.TempDir()
 	nBytes := int64(512)
 
@@ -261,11 +293,27 @@ func TestByBytesEmpty(t *testing.T) {
 	}
 }
 
-func TestByBytesInvalidNBytes(t *testing.T) {
+func TestByBytes_Directory(t *testing.T) {
+	t.Parallel()
+
+	filePath := "testdata"
+	prefix := "TestByBytes_Directory-"
+	outDir := t.TempDir()
+	nBytes := int64(512)
+
+	g := gosplit.New(filePath, prefix)
+	g.SetOutDir(outDir)
+	err := g.ByBytes(nBytes)
+	if err == nil {
+		t.Errorf("ByBytes() with a directory should be error")
+	}
+}
+
+func TestByBytes_InvalidNBytes(t *testing.T) {
 	t.Parallel()
 
 	filePath := "testdata/example.txt"
-	prefix := "TestByBytesInvalidNBytes-"
+	prefix := "TestByBytes_InvalidNBytes-"
 	outDir := t.TempDir()
 	nBytes := int64(0)
 
@@ -413,32 +461,5 @@ func TestParseSize(t *testing.T) {
 				t.Errorf("ParseSize(%#v) = %#v, want %#v", tt.in, got, tt.want)
 			}
 		})
-	}
-}
-
-func TestDirectoryError(t *testing.T) {
-	t.Parallel()
-
-	filePath := "testdata"
-	prefix := "TestDirectoryError-"
-	outDir := t.TempDir()
-	nLines := 10
-	nNumber := 4
-	nBytes := int64(512)
-
-	g := gosplit.New(filePath, prefix)
-	g.SetOutDir(outDir)
-
-	err := g.ByLines(nLines)
-	if err == nil {
-		t.Errorf("ByLines() with a directory should be error")
-	}
-	err = g.ByNumber(nNumber)
-	if err == nil {
-		t.Errorf("ByNumber() with a directory should be error")
-	}
-	err = g.ByBytes(nBytes)
-	if err == nil {
-		t.Errorf("ByBytes() with a directory should be error")
 	}
 }
