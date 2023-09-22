@@ -1,3 +1,4 @@
+// Package gerrors implements generalized error with stacktrace.
 package gerrors
 
 import (

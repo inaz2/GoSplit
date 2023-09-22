@@ -28,7 +28,7 @@ func errorTest2() error {
 	return nil
 }
 
-func TestErrGoSplit(t *testing.T) {
+func TestFormat(t *testing.T) {
 	t.Parallel()
 
 	err := errorTest1()
@@ -67,7 +67,7 @@ func TestErrGoSplit(t *testing.T) {
 	}
 }
 
-func TestErrGoSplitStack(t *testing.T) {
+func TestFormatStack(t *testing.T) {
 	t.Parallel()
 
 	err := errorTest2()
@@ -86,7 +86,7 @@ func TestErrGoSplitStack(t *testing.T) {
 	}
 }
 
-func TestErrGoSplitIs(t *testing.T) {
+func TestIs(t *testing.T) {
 	t.Parallel()
 
 	err := errorTest1()

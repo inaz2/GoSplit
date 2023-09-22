@@ -1,3 +1,4 @@
+// Package safeint implements integer arithmetic checking integer overflow or division by zero.
 package safeint
 
 import (
@@ -14,7 +15,7 @@ func SafeIntErrorf(format string, a ...any) error {
 	return gerrors.Errorf(ErrSafeInt, format, a...)
 }
 
-// MulInt64 returns x*y with checking integer overflow.
+// MulInt64 returns the product x*y.
 func MulInt64(x int64, y int64) (int64, error) {
 	z := x * y
 	if y != 0 && z/y != x {
@@ -23,7 +24,7 @@ func MulInt64(x int64, y int64) (int64, error) {
 	return z, nil
 }
 
-// PowInt64 returns b**k with checking integer overflow.
+// PowInt64 returns the power b**k.
 func PowInt64(b int64, k int64) (int64, error) {
 	var err error
 
