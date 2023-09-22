@@ -38,13 +38,19 @@ func failSubPkg2() Gerror {
 // errSubPkg represents a error in pkg.
 var errPkg = errors.New("pkg")
 
+// PkgErrorf returns a new Gerror from errPkg.
+func PkgErrorf(format string, a ...any) Gerror {
+	return GErrorf(errPkg, format, a...)
+}
+
 // errSubPkgFailed represents a Gerror from subpkg.
-var errSubPkgFailed = GErrorf(errPkg, "failed something in subpkg")
+var errSubPkgFailed = errors.New("failed something in subpkg")
 
 // failSubPkg2 returns a Gerror from failSubPkg2.
 func failPkg() Gerror {
 	if err := failSubPkg2(); err != nil {
-		return GLink(errSubPkgFailed, err)
+		e := PkgErrorf("%w", errSubPkgFailed)
+		return GLink(e, err)
 	}
 	return nil
 }

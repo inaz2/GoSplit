@@ -6,7 +6,6 @@ import (
 	"inaz2/GoSplit/internal/safeint"
 
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -14,14 +13,6 @@ import (
 	"regexp"
 	"strconv"
 )
-
-// ErrGoSplit represents a error in this package.
-var ErrGoSplit = errors.New("gosplit")
-
-// GoSplitErrorf returns a new Gerror from ErrGoSplit.
-func GoSplitErrorf(format string, a ...any) Gerror {
-	return GErrorf(ErrGoSplit, format, a...)
-}
 
 // GoSplit provides the methods for splitting the file.
 type GoSplit struct {
@@ -70,12 +61,12 @@ func (g *GoSplit) ParseSize(strSize string) (int64, Gerror) {
 	re := regexp.MustCompile(`^(\d+)(b|(\w)(iB|B)?)?$`)
 	m := re.FindStringSubmatch(strSize)
 	if m == nil {
-		return 0, GoSplitErrorf("invalid number of bytes: %#v", strSize)
+		return 0, GoSplitErrorf("%w: %#v", ErrInvalidBytes, strSize)
 	}
 
 	x, err := strconv.ParseInt(m[1], 10, 64)
 	if err != nil {
-		return 0, GoSplitErrorf("invalid number of bytes: %#v", strSize)
+		return 0, GoSplitErrorf("%w: %#v", ErrInvalidBytes, strSize)
 	}
 
 	var (
@@ -104,23 +95,23 @@ func (g *GoSplit) ParseSize(strSize string) (int64, Gerror) {
 		}
 		exponent, ok := exponentMap[m[3]]
 		if !ok {
-			return 0, GoSplitErrorf("invalid number of bytes: %#v", strSize)
+			return 0, GoSplitErrorf("%w: %#v", ErrInvalidBytes, strSize)
 		}
 		multiplier, err = safeint.PowInt64(base, exponent)
 		if err != nil {
-			e := GoSplitErrorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
+			e := GoSplitErrorf("%w: %#v: Value too large for defined data type", ErrInvalidBytes, strSize)
 			return 0, GLink(e, err)
 		}
 	}
 
 	n, err := safeint.MulInt64(x, multiplier)
 	if err != nil {
-		e := GoSplitErrorf("invalid number of bytes: %#v: Value too large for defined data type", strSize)
+		e := GoSplitErrorf("%w: %#v: Value too large for defined data type", ErrInvalidBytes, strSize)
 		return 0, GLink(e, err)
 	}
 
 	if n <= 0 {
-		return 0, GoSplitErrorf("invalid number of bytes: %#v: Numerical result out of range", strSize)
+		return 0, GoSplitErrorf("%w: %#v: Numerical result out of range", ErrInvalidBytes, strSize)
 	}
 
 	return n, nil
@@ -129,7 +120,7 @@ func (g *GoSplit) ParseSize(strSize string) (int64, Gerror) {
 // ByLines splits the content of filePath by nLines.
 func (g *GoSplit) ByLines(nLines int) Gerror {
 	if nLines <= 0 {
-		return GoSplitErrorf("invalid number of lines: %#v", nLines)
+		return GoSplitErrorf("%w: %#v", ErrInvalidLines, nLines)
 	}
 
 	var rFile *os.File
@@ -158,13 +149,13 @@ func (g *GoSplit) ByLines(nLines int) Gerror {
 // ByNumber splits the content of filePath into nNumber files.
 func (g *GoSplit) ByNumber(nNumber int) Gerror {
 	if nNumber <= 0 {
-		return GoSplitErrorf("invalid number of chunks: %#v", nNumber)
+		return GoSplitErrorf("%w: %#v", ErrInvalidNumber, nNumber)
 	}
 
 	var rFile *os.File
 	if g.filePath == "-" {
 		// print error message when filePath is stdin
-		return GoSplitErrorf("cannot determine file size")
+		return GoSplitErrorf("%w", ErrUnknownSize)
 	} else {
 		f, err := os.Open(g.filePath)
 		if err != nil {
@@ -178,7 +169,7 @@ func (g *GoSplit) ByNumber(nNumber int) Gerror {
 		}
 		mode := fi.Mode()
 		if !mode.IsRegular() {
-			return GoSplitErrorf("cannot determine file size")
+			return GoSplitErrorf("%w", ErrUnknownSize)
 		}
 
 		rFile = f
@@ -203,7 +194,7 @@ func (g *GoSplit) ByNumber(nNumber int) Gerror {
 // ByBytes splits the content of filePath by nBytes.
 func (g *GoSplit) ByBytes(nBytes int64) Gerror {
 	if nBytes <= 0 {
-		return GoSplitErrorf("invalid number of bytes: %#v", nBytes)
+		return GoSplitErrorf("%w: %#v", ErrInvalidBytes, nBytes)
 	}
 
 	var rFile *os.File
@@ -236,7 +227,7 @@ func (g *GoSplit) checkFileSize(rFile *os.File) (int64, Gerror) {
 		return 0, GoSplitErrorf("failed to stat: %w", err)
 	}
 	if fi.IsDir() {
-		return 0, GoSplitErrorf("is a directory")
+		return 0, GoSplitErrorf("%w", ErrIsDirectory)
 	}
 	fileSize := fi.Size()
 
@@ -246,7 +237,7 @@ func (g *GoSplit) checkFileSize(rFile *os.File) (int64, Gerror) {
 	}
 
 	if uint64(fileSize) > freeBytesAvailable {
-		return 0, GoSplitErrorf("no free space available")
+		return 0, GoSplitErrorf("%w", ErrNoFreeSpace)
 	}
 	return fileSize, nil
 }
@@ -264,7 +255,7 @@ func (g *GoSplit) generateOutFilePath(number int) (string, Gerror) {
 	}
 
 	if number >= len(table)*len(table) {
-		return "", GoSplitErrorf("output file suffixes exhausted")
+		return "", GoSplitErrorf("%w", ErrSuffixExhausted)
 	}
 
 	n0 := number % len(table)
