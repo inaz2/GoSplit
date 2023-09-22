@@ -20,6 +20,11 @@ func SubPkgErrorf(format string, a ...any) Gerror {
 	return GErrorf(errSubPkg, format, a...)
 }
 
+// okSubPkg returns nil as a Gerror.
+func okSubPkg() Gerror {
+	return nil
+}
+
 // failSubPkg1 returns a Gerror with fs.ErrExist.
 func failSubPkg1() Gerror {
 	return SubPkgErrorf("failed something in fs: %w", fs.ErrExist)
@@ -53,6 +58,14 @@ func failPkg() Gerror {
 		return GLink(e, err)
 	}
 	return nil
+}
+
+func TestNil(t *testing.T) {
+	t.Parallel()
+
+	if err := okSubPkg(); err != nil {
+		t.Errorf("got = %#v, want nil", err)
+	}
 }
 
 func TestFormat(t *testing.T) {
