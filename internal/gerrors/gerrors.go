@@ -7,9 +7,9 @@ import (
 	"runtime/debug"
 )
 
-// Gerror represents the interface compatible with error. Intended to use instead of error.
+// Gerror represents the interface extending error. Intended to use this instead of error for type checking.
 type Gerror interface {
-	Error() string
+	error
 	GError() string
 }
 
@@ -42,7 +42,7 @@ func GLink(err2 error, err1 error) Gerror {
 	return &ErrorWithStack{err: err, stack: stack}
 }
 
-// Error implemenrts error.Error.
+// Error implements error interface.
 func (e *ErrorWithStack) Error() string {
 	return e.GError()
 }
