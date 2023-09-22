@@ -82,14 +82,14 @@ func TestByLines_EmptyFile(t *testing.T) {
 
 	g := gosplit.New(filePath, prefix)
 	g.SetOutDir(outDir)
-	err := g.ByLines(nLines)
-	if err != nil {
-		t.Fatal("ByLines() failed:", err)
+	gerr := g.ByLines(nLines)
+	if gerr != nil {
+		t.Fatal("ByLines() failed:", gerr)
 	}
 
 	outFileName := prefix + "aa"
 	outFilePath := path.Join(outDir, outFileName)
-	_, err = os.Stat(outFilePath)
+	_, err := os.Stat(outFilePath)
 	if err == nil {
 		t.Errorf("os.Stat(%#v) should be error", outFilePath)
 	}
@@ -280,14 +280,14 @@ func TestByBytes_EmptyFile(t *testing.T) {
 
 	g := gosplit.New(filePath, prefix)
 	g.SetOutDir(outDir)
-	err := g.ByBytes(nBytes)
-	if err != nil {
-		t.Fatal("ByBytes() failed:", err)
+	gerr := g.ByBytes(nBytes)
+	if gerr != nil {
+		t.Fatal("ByBytes() failed:", gerr)
 	}
 
 	outFileName := prefix + "aa"
 	outFilePath := path.Join(outDir, outFileName)
-	_, err = os.Stat(outFilePath)
+	_, err := os.Stat(outFilePath)
 	if err == nil {
 		t.Errorf("os.Stat(%#v) should be error", outFilePath)
 	}
@@ -398,14 +398,14 @@ func TestSetElideEmptyFiles(t *testing.T) {
 	g := gosplit.New(filePath, prefix)
 	g.SetOutDir(outDir)
 	g.SetElideEmptyFiles(true)
-	err := g.ByNumber(nNumber)
-	if err != nil {
-		t.Fatal("ByNumber() failed:", err)
+	gerr := g.ByNumber(nNumber)
+	if gerr != nil {
+		t.Fatal("ByNumber() failed:", gerr)
 	}
 
 	outFileName := prefix + "aa"
 	outFilePath := path.Join(outDir, outFileName)
-	_, err = os.Stat(outFilePath)
+	_, err := os.Stat(outFilePath)
 	if err == nil {
 		t.Errorf("os.Stat(%#v) should be error", outFilePath)
 	}

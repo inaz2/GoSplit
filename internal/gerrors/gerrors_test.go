@@ -1,7 +1,7 @@
 package gerrors_test
 
 import (
-	"inaz2/GoSplit/internal/gerrors"
+	. "inaz2/GoSplit/internal/gerrors"
 
 	"errors"
 	"fmt"
@@ -15,18 +15,18 @@ import (
 // errSubPkg represents a error in subpkg.
 var errSubPkg = errors.New("subpkg")
 
-// SubPkgErrorf returns a new error with errSubPkg.
-func SubPkgErrorf(format string, a ...any) error {
-	return gerrors.Errorf(errSubPkg, format, a...)
+// SubPkgErrorf returns a new Gerror from errSubPkg.
+func SubPkgErrorf(format string, a ...any) Gerror {
+	return GErrorf(errSubPkg, format, a...)
 }
 
-// failSubPkg1 returns a error with fs.ErrExist.
-func failSubPkg1() error {
+// failSubPkg1 returns a Gerror with fs.ErrExist.
+func failSubPkg1() Gerror {
 	return SubPkgErrorf("failed something in fs: %w", fs.ErrExist)
 }
 
-// failSubPkg2 returns a error from failSubPkg1.
-func failSubPkg2() error {
+// failSubPkg2 returns a Gerror from failSubPkg1.
+func failSubPkg2() Gerror {
 	if err := failSubPkg1(); err != nil {
 		return SubPkgErrorf("failed to failSubPkg1: %w", err)
 	}
@@ -38,13 +38,13 @@ func failSubPkg2() error {
 // errSubPkg represents a error in pkg.
 var errPkg = errors.New("pkg")
 
-// errSubPkgFailed represents a error from subpkg.
-var errSubPkgFailed = gerrors.Errorf(errPkg, "failed something in subpkg")
+// errSubPkgFailed represents a Gerror from subpkg.
+var errSubPkgFailed = GErrorf(errPkg, "failed something in subpkg")
 
-// failSubPkg2 returns a error from failSubPkg2.
-func failPkg() error {
+// failSubPkg2 returns a Gerror from failSubPkg2.
+func failPkg() Gerror {
 	if err := failSubPkg2(); err != nil {
-		return gerrors.Link(errSubPkgFailed, err)
+		return GLink(errSubPkgFailed, err)
 	}
 	return nil
 }

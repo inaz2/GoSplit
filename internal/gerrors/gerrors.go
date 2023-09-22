@@ -7,20 +7,26 @@ import (
 	"runtime/debug"
 )
 
+// Gerror represents the interface compatible with error. Intended to use instead of error.
+type Gerror interface {
+	Error() string
+	GError() string
+}
+
 // ErrorWithStack represents error and stacktrace.
 type ErrorWithStack struct {
 	err   error
 	stack []byte
 }
 
-// Errorf returns a new errBase error with formatting. The error string of errBase is discarded.
-func Errorf(errBase error, format string, a ...any) error {
+// GErrorf returns a new Gerror from errBase by formatting. The error string of errBase is discarded.
+func GErrorf(errBase error, format string, a ...any) Gerror {
 	err := fmt.Errorf(format, a...)
-	return Link(err, errBase)
+	return GLink(err, errBase)
 }
 
-// Link returns a new error linked to err1. The error string of err1 is discarded.
-func Link(err2 error, err1 error) error {
+// GLink returns a new Gerror from err2 and links it to err1. The error string of err1 is discarded.
+func GLink(err2 error, err1 error) Gerror {
 	// prepend err1 by zero-length formatting "%.w"
 	err := fmt.Errorf("%.w%w", err1, err2)
 
@@ -38,6 +44,11 @@ func Link(err2 error, err1 error) error {
 
 // Error implemenrts error.Error.
 func (e *ErrorWithStack) Error() string {
+	return e.GError()
+}
+
+// GError implemenrts Gerror interface.
+func (e *ErrorWithStack) GError() string {
 	return e.err.Error()
 }
 

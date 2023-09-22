@@ -2,7 +2,7 @@
 package safeint
 
 import (
-	"inaz2/GoSplit/internal/gerrors"
+	. "inaz2/GoSplit/internal/gerrors"
 
 	"errors"
 )
@@ -10,13 +10,13 @@ import (
 // ErrSafeInt represents a error in this package.
 var ErrSafeInt = errors.New("safeint")
 
-// SafeIntErrorf returns a new error with ErrSafeInt.
-func SafeIntErrorf(format string, a ...any) error {
-	return gerrors.Errorf(ErrSafeInt, format, a...)
+// SafeIntErrorf returns a new Gerror from ErrSafeInt.
+func SafeIntErrorf(format string, a ...any) Gerror {
+	return GErrorf(ErrSafeInt, format, a...)
 }
 
 // MulInt64 returns the product x*y.
-func MulInt64(x int64, y int64) (int64, error) {
+func MulInt64(x int64, y int64) (int64, Gerror) {
 	z := x * y
 	if y != 0 && z/y != x {
 		return 0, SafeIntErrorf("integer overflow occured: %#v * %#v -> %#v", x, y, z)
@@ -25,8 +25,8 @@ func MulInt64(x int64, y int64) (int64, error) {
 }
 
 // PowInt64 returns the power b**k.
-func PowInt64(b int64, k int64) (int64, error) {
-	var err error
+func PowInt64(b int64, k int64) (int64, Gerror) {
+	var err Gerror
 
 	if k < 0 {
 		// b**k == 1 / (b**(-k))
