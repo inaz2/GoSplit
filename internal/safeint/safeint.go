@@ -3,23 +3,13 @@ package safeint
 
 import (
 	. "inaz2/GoSplit/internal/gerrors"
-
-	"errors"
 )
-
-// ErrSafeInt represents a error in this package.
-var ErrSafeInt = errors.New("safeint")
-
-// SafeIntErrorf returns a new Gerror from ErrSafeInt.
-func SafeIntErrorf(format string, a ...any) Gerror {
-	return GErrorf(ErrSafeInt, format, a...)
-}
 
 // MulInt64 returns the product x*y.
 func MulInt64(x int64, y int64) (int64, Gerror) {
 	z := x * y
 	if y != 0 && z/y != x {
-		return 0, SafeIntErrorf("integer overflow occured: %#v * %#v -> %#v", x, y, z)
+		return 0, SafeIntErrorf("%w: %#v * %#v -> %#v", ErrOverflow, x, y, z)
 	}
 	return z, nil
 }
@@ -32,7 +22,7 @@ func PowInt64(b int64, k int64) (int64, Gerror) {
 		// b**k == 1 / (b**(-k))
 		switch b {
 		case 0:
-			return 0, SafeIntErrorf("division by zero: 0 ** %#v", k)
+			return 0, SafeIntErrorf("%w: 0 ** %#v", ErrDivisionByZero, k)
 		case 1:
 			return 1, nil
 		case -1:
