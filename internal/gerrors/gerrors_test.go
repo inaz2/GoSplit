@@ -12,7 +12,7 @@ import (
 
 // usage in pkg/subpkg
 
-// errSubPkg represents a error in subpkg.
+// errSubPkg represents any errors in subpkg.
 var errSubPkg = errors.New("subpkg")
 
 // SubPkgErrorf returns a new Gerror from errSubPkg.
@@ -25,7 +25,7 @@ func okSubPkg() Gerror {
 	return nil
 }
 
-// failSubPkg1 returns a Gerror with fs.ErrExist.
+// failSubPkg1 returns a Gerror linked to fs.ErrExist.
 func failSubPkg1() Gerror {
 	return SubPkgErrorf("failed something in fs: %w", fs.ErrExist)
 }
@@ -40,7 +40,7 @@ func failSubPkg2() Gerror {
 
 // usage in pkg
 
-// errSubPkg represents a error in pkg.
+// errPkg represents any errors in pkg.
 var errPkg = errors.New("pkg")
 
 // PkgErrorf returns a new Gerror from errPkg.
@@ -48,13 +48,13 @@ func PkgErrorf(format string, a ...any) Gerror {
 	return GErrorf(errPkg, format, a...)
 }
 
-// errSubPkgFailed represents a Gerror from subpkg.
-var errSubPkgFailed = errors.New("failed something in subpkg")
+// errPkgInternal represents a Gerror from subpkg.
+var errPkgInternal = errors.New("failed something in subpkg")
 
 // failSubPkg2 returns a Gerror from failSubPkg2.
 func failPkg() Gerror {
 	if err := failSubPkg2(); err != nil {
-		e := PkgErrorf("%w", errSubPkgFailed)
+		e := PkgErrorf("%w", errPkgInternal)
 		return GLink(e, err)
 	}
 	return nil
@@ -177,8 +177,8 @@ func TestJoin_Is(t *testing.T) {
 
 	err := failPkg()
 
-	if ok := errors.Is(err, errSubPkgFailed); !ok {
-		t.Errorf("errors.Is(err, errSubPkgFailed) = false, want true")
+	if ok := errors.Is(err, errPkgInternal); !ok {
+		t.Errorf("errors.Is(err, errPkgInternal) = false, want true")
 	}
 	if ok := errors.Is(err, errPkg); !ok {
 		t.Errorf("errors.Is(err, errPkg) = false, want true")
@@ -189,7 +189,7 @@ func TestJoin_Is(t *testing.T) {
 	if ok := errors.Is(err, fs.ErrExist); !ok {
 		t.Errorf("errors.Is(err, fs.ErrExist) = false, want true")
 	}
-	if ok := errors.Is(errSubPkgFailed, err); ok {
-		t.Errorf("errors.Is(errSubPkgFailed, err) = true, want false")
+	if ok := errors.Is(errPkgInternal, err); ok {
+		t.Errorf("errors.Is(errPkgInternal, err) = true, want false")
 	}
 }
