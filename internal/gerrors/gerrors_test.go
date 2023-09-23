@@ -79,8 +79,8 @@ func TestFormat(t *testing.T) {
 	}{
 		"%v":   {"%v", "failed something in fs: file already exists", false},
 		"%+v":  {"%+v", "failed something in fs: file already exists\n", true},
-		"%#v":  {"%#v", "&gerrors.ErrorWithStack{err: &fmt.wrapErrors{msg:\"failed something in fs: file already exists\", ", true},
-		"%#+v": {"%#+v", "&gerrors.ErrorWithStack{err: &fmt.wrapErrors{msg:\"failed something in fs: file already exists\", ", true},
+		"%#v":  {"%#v", "&gerrors.errorWithStack{err: &fmt.wrapErrors{msg:\"failed something in fs: file already exists\", ", true},
+		"%#+v": {"%#+v", "&gerrors.errorWithStack{err: &fmt.wrapErrors{msg:\"failed something in fs: file already exists\", ", true},
 		"%s":   {"%s", "failed something in fs: file already exists", false},
 		"%q":   {"%q", "\"failed something in fs: file already exists\"", false},
 		"%x":   {"%x", "6661696c656420736f6d657468696e6720696e2066733a2066696c6520616c726561647920657869737473", false},
