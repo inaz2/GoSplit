@@ -18,7 +18,7 @@ type errorWithStack struct {
 // Intended to use Gerror instead of error for type checking.
 type Gerror interface {
 	error
-	GError() *errorWithStack
+	value() *errorWithStack
 }
 
 // GErrorf returns a new Gerror from err by formatting. The error string of err is discarded.
@@ -49,8 +49,8 @@ func (e *errorWithStack) Error() string {
 	return e.err.Error()
 }
 
-// GError implements Gerror interface, that requires errorWithStack.
-func (e *errorWithStack) GError() *errorWithStack {
+// value implements Gerror interface, requires that its type is *errorWithStack.
+func (e *errorWithStack) value() *errorWithStack {
 	return e
 }
 
