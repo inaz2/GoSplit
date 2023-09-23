@@ -232,7 +232,7 @@ func (g *GoSplit) checkFileSize(rFile *os.File) (int64, Gerror) {
 	fileSize := fi.Size()
 
 	freeBytesAvailable, gerr := getDiskFreeSpace(g.outDir)
-	if err != nil {
+	if gerr != nil {
 		return 0, gerr
 	}
 
