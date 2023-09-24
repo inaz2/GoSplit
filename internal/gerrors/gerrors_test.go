@@ -15,6 +15,7 @@ import (
 // errSubPkg represents any errors in subpkg.
 var errSubPkg = errors.New("subpkg")
 
+// wrapperSubPkg is a error wrapper for subpkg.
 var wrapperSubPkg = g.NewWrapper(errSubPkg)
 
 // okSubPkg returns nil as a g.Error.
@@ -40,9 +41,10 @@ func failSubPkg2() g.Error {
 // errPkg represents any errors in pkg.
 var errPkg = errors.New("pkg")
 
+// wrapperPkg is a error wrapper for pkg.
 var wrapperPkg = g.NewWrapper(errPkg)
 
-// errPkgInternal represents a g.Error from subpkg.
+// errPkgInternal represents a specific error about subpkg.
 var errPkgInternal = errors.New("failed something in subpkg")
 
 // failSubPkg2 returns a g.Error from failSubPkg2.
