@@ -3,7 +3,7 @@
 package gosplit
 
 import (
-	. "inaz2/GoSplit/internal/gerrors"
+	g "inaz2/GoSplit/internal/gerrors"
 
 	"path/filepath"
 
@@ -11,7 +11,7 @@ import (
 )
 
 // getDiskFreeSpace returns free disk space where dirPath exists.
-func getDiskFreeSpace(dirPath string) (uint64, Gerror) {
+func getDiskFreeSpace(dirPath string) (uint64, g.Error) {
 	var (
 		freeBytesAvailableToCaller uint64
 		totalNumberOfBytes         uint64
@@ -21,7 +21,7 @@ func getDiskFreeSpace(dirPath string) (uint64, Gerror) {
 	dirPath = filepath.FromSlash(dirPath)
 	err := windows.GetDiskFreeSpaceEx(windows.StringToUTF16Ptr(dirPath), &freeBytesAvailableToCaller, &totalNumberOfBytes, &totalNumberOfFreeBytes)
 	if err != nil {
-		return 0, GoSplitErrorf("failed to windows.GetFreeSpaceEx: %w", err)
+		return 0, wrapper.Errorf("failed to windows.GetFreeSpaceEx: %w", err)
 	}
 	return freeBytesAvailableToCaller, nil
 }

@@ -13,35 +13,12 @@ type errorWithStack struct {
 	stack []byte
 }
 
-// Gerror represents the interface extending error. Formatting "%+v" as error with stacktrace.
+// Error represents the interface extending error. Formatting "%+v" as error with stacktrace.
 //
-// Intended to use Gerror instead of error for type checking.
-type Gerror interface {
+// Intended to use Error instead of error for type checking.
+type Error interface {
 	error
 	value() *errorWithStack
-}
-
-// GErrorf returns a new Gerror from err by formatting. The error string of err is discarded.
-func GErrorf(err error, format string, a ...any) Gerror {
-	e := fmt.Errorf(format, a...)
-	return GLink(e, err)
-}
-
-// GLink returns a new Gerror from err2 and links it to err1. The error string of err1 is discarded.
-func GLink(err2 error, err1 error) Gerror {
-	// prepend err1 by zero-length formatting "%.w"
-	e := fmt.Errorf("%.w%w", err1, err2)
-
-	var stack []byte
-	var tmp *errorWithStack
-	if errors.As(e, &tmp) {
-		// keep original stacktrace
-		stack = tmp.stack
-	} else {
-		stack = debug.Stack()
-	}
-
-	return &errorWithStack{err: e, stack: stack}
 }
 
 // Error implements errors.error interface.
@@ -49,7 +26,7 @@ func (e *errorWithStack) Error() string {
 	return e.err.Error()
 }
 
-// value implements Gerror interface, requires that its type is *errorWithStack.
+// value implements Error interface, requires that its type is *errorWithStack.
 func (e *errorWithStack) value() *errorWithStack {
 	return e
 }
@@ -77,4 +54,44 @@ func (e *errorWithStack) Format(f fmt.State, verb rune) {
 		msg += "\n" + string(e.stack)
 	}
 	fmt.Fprint(f, msg)
+}
+
+// Wrapper represents base error. The error string of base error is discarded.
+//
+// Intended to use Wrapper.Errorf instead of fmt.Errorf.
+type Wrapper struct {
+	err error
+}
+
+// NewWrapper returns a new Wrapper.
+func NewWrapper(err error) *Wrapper {
+	return &Wrapper{err: err}
+}
+
+// Errorf returns a new Error by formatting.
+func (f *Wrapper) Errorf(format string, a ...any) Error {
+	err := fmt.Errorf(format, a...)
+	return f.Link(err, f.err)
+}
+
+// Link returns a new Error linked to errOld. The error string of errOld is discarded.
+func (f *Wrapper) Link(errNew error, errOld error) Error {
+	// prepend errOld by zero-length formatting "%.w"
+	err := fmt.Errorf("%.w%w", errOld, errNew)
+
+	// ensure that a error wraps the base error
+	if !errors.Is(err, f.err) {
+		err = fmt.Errorf("%w%.w", err, f.err)
+	}
+
+	var stack []byte
+	var tmp *errorWithStack
+	if errors.As(err, &tmp) {
+		// keep original stacktrace
+		stack = tmp.stack
+	} else {
+		stack = debug.Stack()
+	}
+
+	return &errorWithStack{err: err, stack: stack}
 }

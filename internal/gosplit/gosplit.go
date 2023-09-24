@@ -2,7 +2,7 @@
 package gosplit
 
 import (
-	. "inaz2/GoSplit/internal/gerrors"
+	g "inaz2/GoSplit/internal/gerrors"
 	"inaz2/GoSplit/internal/safeint"
 
 	"bufio"
@@ -57,16 +57,16 @@ func (g *GoSplit) SetOutDir(outDir string) {
 }
 
 // ParseSize converts strSize to nBytes, e.g. "10K" -> 10 * 1024.
-func (g *GoSplit) ParseSize(strSize string) (int64, Gerror) {
+func (g *GoSplit) ParseSize(strSize string) (int64, g.Error) {
 	re := regexp.MustCompile(`^(\d+)(b|(\w)(iB|B)?)?$`)
 	m := re.FindStringSubmatch(strSize)
 	if m == nil {
-		return 0, GoSplitErrorf("%w: %#v", ErrInvalidBytes, strSize)
+		return 0, wrapper.Errorf("%w: %#v", ErrInvalidBytes, strSize)
 	}
 
 	x, err := strconv.ParseInt(m[1], 10, 64)
 	if err != nil {
-		return 0, GoSplitErrorf("%w: %#v", ErrInvalidBytes, strSize)
+		return 0, wrapper.Errorf("%w: %#v", ErrInvalidBytes, strSize)
 	}
 
 	var (
@@ -95,32 +95,32 @@ func (g *GoSplit) ParseSize(strSize string) (int64, Gerror) {
 		}
 		exponent, ok := exponentMap[m[3]]
 		if !ok {
-			return 0, GoSplitErrorf("%w: %#v", ErrInvalidBytes, strSize)
+			return 0, wrapper.Errorf("%w: %#v", ErrInvalidBytes, strSize)
 		}
 		multiplier, err = safeint.PowInt64(base, exponent)
 		if err != nil {
-			e := GoSplitErrorf("%w: %#v: Value too large for defined data type", ErrInvalidBytes, strSize)
-			return 0, GLink(e, err)
+			e := wrapper.Errorf("%w: %#v: Value too large for defined data type", ErrInvalidBytes, strSize)
+			return 0, wrapper.Link(e, err)
 		}
 	}
 
 	n, err := safeint.MulInt64(x, multiplier)
 	if err != nil {
-		e := GoSplitErrorf("%w: %#v: Value too large for defined data type", ErrInvalidBytes, strSize)
-		return 0, GLink(e, err)
+		e := wrapper.Errorf("%w: %#v: Value too large for defined data type", ErrInvalidBytes, strSize)
+		return 0, wrapper.Link(e, err)
 	}
 
 	if n <= 0 {
-		return 0, GoSplitErrorf("%w: %#v: Numerical result out of range", ErrInvalidBytes, strSize)
+		return 0, wrapper.Errorf("%w: %#v: Numerical result out of range", ErrInvalidBytes, strSize)
 	}
 
 	return n, nil
 }
 
 // ByLines splits the content of filePath by nLines.
-func (g *GoSplit) ByLines(nLines int) Gerror {
+func (g *GoSplit) ByLines(nLines int) g.Error {
 	if nLines <= 0 {
-		return GoSplitErrorf("%w: %#v", ErrInvalidLines, nLines)
+		return wrapper.Errorf("%w: %#v", ErrInvalidLines, nLines)
 	}
 
 	var rFile *os.File
@@ -129,7 +129,7 @@ func (g *GoSplit) ByLines(nLines int) Gerror {
 	} else {
 		f, err := os.Open(g.filePath)
 		if err != nil {
-			return GoSplitErrorf("failed to open: %w", err)
+			return wrapper.Errorf("failed to open: %w", err)
 		}
 		defer f.Close()
 
@@ -147,29 +147,29 @@ func (g *GoSplit) ByLines(nLines int) Gerror {
 }
 
 // ByNumber splits the content of filePath into nNumber files.
-func (g *GoSplit) ByNumber(nNumber int) Gerror {
+func (g *GoSplit) ByNumber(nNumber int) g.Error {
 	if nNumber <= 0 {
-		return GoSplitErrorf("%w: %#v", ErrInvalidNumber, nNumber)
+		return wrapper.Errorf("%w: %#v", ErrInvalidNumber, nNumber)
 	}
 
 	var rFile *os.File
 	if g.filePath == "-" {
 		// print error message when filePath is stdin
-		return GoSplitErrorf("%w", ErrUnknownSize)
+		return wrapper.Errorf("%w", ErrUnknownSize)
 	} else {
 		f, err := os.Open(g.filePath)
 		if err != nil {
-			return GoSplitErrorf("failed to open: %w", err)
+			return wrapper.Errorf("failed to open: %w", err)
 		}
 		defer f.Close()
 
 		fi, err := f.Stat()
 		if err != nil {
-			return GoSplitErrorf("failed to stat: %w", err)
+			return wrapper.Errorf("failed to stat: %w", err)
 		}
 		mode := fi.Mode()
 		if !mode.IsRegular() {
-			return GoSplitErrorf("%w", ErrUnknownSize)
+			return wrapper.Errorf("%w", ErrUnknownSize)
 		}
 
 		rFile = f
@@ -192,9 +192,9 @@ func (g *GoSplit) ByNumber(nNumber int) Gerror {
 }
 
 // ByBytes splits the content of filePath by nBytes.
-func (g *GoSplit) ByBytes(nBytes int64) Gerror {
+func (g *GoSplit) ByBytes(nBytes int64) g.Error {
 	if nBytes <= 0 {
-		return GoSplitErrorf("%w: %#v", ErrInvalidBytes, nBytes)
+		return wrapper.Errorf("%w: %#v", ErrInvalidBytes, nBytes)
 	}
 
 	var rFile *os.File
@@ -203,7 +203,7 @@ func (g *GoSplit) ByBytes(nBytes int64) Gerror {
 	} else {
 		f, err := os.Open(g.filePath)
 		if err != nil {
-			return GoSplitErrorf("failed to open: %w", err)
+			return wrapper.Errorf("failed to open: %w", err)
 		}
 		defer f.Close()
 
@@ -221,13 +221,13 @@ func (g *GoSplit) ByBytes(nBytes int64) Gerror {
 }
 
 // checkFileSize returns fileSize with checking disk free space for output files.
-func (g *GoSplit) checkFileSize(rFile *os.File) (int64, Gerror) {
+func (g *GoSplit) checkFileSize(rFile *os.File) (int64, g.Error) {
 	fi, err := rFile.Stat()
 	if err != nil {
-		return 0, GoSplitErrorf("failed to stat: %w", err)
+		return 0, wrapper.Errorf("failed to stat: %w", err)
 	}
 	if fi.IsDir() {
-		return 0, GoSplitErrorf("%w", ErrIsDirectory)
+		return 0, wrapper.Errorf("%w", ErrIsDirectory)
 	}
 	fileSize := fi.Size()
 
@@ -237,7 +237,7 @@ func (g *GoSplit) checkFileSize(rFile *os.File) (int64, Gerror) {
 	}
 
 	if uint64(fileSize) > freeBytesAvailable {
-		return 0, GoSplitErrorf("%w", ErrNoFreeSpace)
+		return 0, wrapper.Errorf("%w", ErrNoFreeSpace)
 	}
 	return fileSize, nil
 }
@@ -245,7 +245,7 @@ func (g *GoSplit) checkFileSize(rFile *os.File) (int64, Gerror) {
 // generateOutFilePath returns n-th output file name with prefix.
 //
 // only support 2-character suffix; aa , ab, ..., zz.
-func (g *GoSplit) generateOutFilePath(number int) (string, Gerror) {
+func (g *GoSplit) generateOutFilePath(number int) (string, g.Error) {
 	var table []byte
 
 	if g.bNumericSuffix {
@@ -255,7 +255,7 @@ func (g *GoSplit) generateOutFilePath(number int) (string, Gerror) {
 	}
 
 	if number >= len(table)*len(table) {
-		return "", GoSplitErrorf("%w", ErrSuffixExhausted)
+		return "", wrapper.Errorf("%w", ErrSuffixExhausted)
 	}
 
 	n0 := number % len(table)
@@ -269,7 +269,7 @@ func (g *GoSplit) generateOutFilePath(number int) (string, Gerror) {
 }
 
 // doByLines splits the content from io.Reader by nLines.
-func (g *GoSplit) doByLines(r io.Reader, nLines int) Gerror {
+func (g *GoSplit) doByLines(r io.Reader, nLines int) g.Error {
 	scanner := bufio.NewScanner(r)
 
 OuterLoop:
@@ -280,7 +280,7 @@ OuterLoop:
 		}
 		wFile, err := os.Create(outFilePath)
 		if err != nil {
-			return GoSplitErrorf("failed to create: %w", err)
+			return wrapper.Errorf("failed to create: %w", err)
 		}
 		fmt.Fprintf(g.wVerbose, "creating file %#v\n", outFilePath)
 
@@ -296,14 +296,14 @@ OuterLoop:
 	}
 
 	if err := scanner.Err(); err != nil {
-		return GoSplitErrorf("failed to read: %w", err)
+		return wrapper.Errorf("failed to read: %w", err)
 	}
 
 	return nil
 }
 
 // doByNumber splits the content from io.Reader into nNumber files.
-func (g *GoSplit) doByNumber(r io.Reader, fileSize int64, nNumber int) Gerror {
+func (g *GoSplit) doByNumber(r io.Reader, fileSize int64, nNumber int) g.Error {
 	chunkSize := fileSize / int64(nNumber)
 
 	for i := 0; i < nNumber; i++ {
@@ -313,7 +313,7 @@ func (g *GoSplit) doByNumber(r io.Reader, fileSize int64, nNumber int) Gerror {
 		}
 		wFile, err := os.Create(outFilePath)
 		if err != nil {
-			return GoSplitErrorf("failed to create: %w", err)
+			return wrapper.Errorf("failed to create: %w", err)
 		}
 		fmt.Fprintf(g.wVerbose, "creating file %#v\n", outFilePath)
 
@@ -327,11 +327,11 @@ func (g *GoSplit) doByNumber(r io.Reader, fileSize int64, nNumber int) Gerror {
 				break
 			}
 			if err != nil {
-				return GoSplitErrorf("failed to write: %w", err)
+				return wrapper.Errorf("failed to write: %w", err)
 			}
 		} else {
 			if _, err := io.Copy(wFile, r); err != nil {
-				return GoSplitErrorf("failed to write: %w", err)
+				return wrapper.Errorf("failed to write: %w", err)
 			}
 		}
 	}
@@ -340,7 +340,7 @@ func (g *GoSplit) doByNumber(r io.Reader, fileSize int64, nNumber int) Gerror {
 }
 
 // doByBytes splits the content from io.Reader by nBytes.
-func (g *GoSplit) doByBytes(r io.Reader, nBytes int64) Gerror {
+func (g *GoSplit) doByBytes(r io.Reader, nBytes int64) g.Error {
 	for i := 0; ; i++ {
 		outFilePath, gerr := g.generateOutFilePath(i)
 		if gerr != nil {
@@ -348,7 +348,7 @@ func (g *GoSplit) doByBytes(r io.Reader, nBytes int64) Gerror {
 		}
 		wFile, err := os.Create(outFilePath)
 		if err != nil {
-			return GoSplitErrorf("failed to create: %w", err)
+			return wrapper.Errorf("failed to create: %w", err)
 		}
 		fmt.Fprintf(g.wVerbose, "creating file %#v\n", outFilePath)
 
@@ -360,7 +360,7 @@ func (g *GoSplit) doByBytes(r io.Reader, nBytes int64) Gerror {
 			break
 		}
 		if err != nil {
-			return GoSplitErrorf("failed to write: %w", err)
+			return wrapper.Errorf("failed to write: %w", err)
 		}
 	}
 
