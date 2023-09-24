@@ -2,27 +2,27 @@
 package safeint
 
 import (
-	. "inaz2/GoSplit/internal/gerrors"
+	g "inaz2/GoSplit/internal/gerrors"
 )
 
 // MulInt64 returns the product x*y.
-func MulInt64(x int64, y int64) (int64, Gerror) {
+func MulInt64(x int64, y int64) (int64, g.Error) {
 	z := x * y
 	if y != 0 && z/y != x {
-		return 0, SafeIntErrorf("%w: %#v * %#v -> %#v", ErrOverflow, x, y, z)
+		return 0, wrapper.Errorf("%w: %#v * %#v -> %#v", ErrOverflow, x, y, z)
 	}
 	return z, nil
 }
 
 // PowInt64 returns the power b**k.
-func PowInt64(b int64, k int64) (int64, Gerror) {
-	var err Gerror
+func PowInt64(b int64, k int64) (int64, g.Error) {
+	var err g.Error
 
 	if k < 0 {
 		// b**k == 1 / (b**(-k))
 		switch b {
 		case 0:
-			return 0, SafeIntErrorf("%w: 0 ** %#v", ErrDivisionByZero, k)
+			return 0, wrapper.Errorf("%w: 0 ** %#v", ErrDivisionByZero, k)
 		case 1:
 			return 1, nil
 		case -1:

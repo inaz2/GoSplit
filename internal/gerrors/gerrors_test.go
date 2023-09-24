@@ -1,7 +1,7 @@
 package gerrors_test
 
 import (
-	. "inaz2/GoSplit/internal/gerrors"
+	g "inaz2/GoSplit/internal/gerrors"
 
 	"errors"
 	"fmt"
@@ -15,25 +15,22 @@ import (
 // errSubPkg represents any errors in subpkg.
 var errSubPkg = errors.New("subpkg")
 
-// SubPkgErrorf returns a new Gerror from errSubPkg.
-func SubPkgErrorf(format string, a ...any) Gerror {
-	return GErrorf(errSubPkg, format, a...)
-}
+var wrapperSubPkg = g.NewWrapper(errSubPkg)
 
-// okSubPkg returns nil as a Gerror.
-func okSubPkg() Gerror {
+// okSubPkg returns nil as a g.Error.
+func okSubPkg() g.Error {
 	return nil
 }
 
-// failSubPkg1 returns a Gerror linked to fs.ErrExist.
-func failSubPkg1() Gerror {
-	return SubPkgErrorf("failed something in fs: %w", fs.ErrExist)
+// failSubPkg1 returns a g.Error linked to fs.ErrExist.
+func failSubPkg1() g.Error {
+	return wrapperSubPkg.Errorf("failed something in fs: %w", fs.ErrExist)
 }
 
-// failSubPkg2 returns a Gerror from failSubPkg1.
-func failSubPkg2() Gerror {
+// failSubPkg2 returns a g.Error from failSubPkg1.
+func failSubPkg2() g.Error {
 	if err := failSubPkg1(); err != nil {
-		return SubPkgErrorf("failed to failSubPkg1: %w", err)
+		return wrapperSubPkg.Errorf("failed to failSubPkg1: %w", err)
 	}
 	return nil
 }
@@ -43,19 +40,15 @@ func failSubPkg2() Gerror {
 // errPkg represents any errors in pkg.
 var errPkg = errors.New("pkg")
 
-// PkgErrorf returns a new Gerror from errPkg.
-func PkgErrorf(format string, a ...any) Gerror {
-	return GErrorf(errPkg, format, a...)
-}
+var wrapperPkg = g.NewWrapper(errPkg)
 
-// errPkgInternal represents a Gerror from subpkg.
+// errPkgInternal represents a g.Error from subpkg.
 var errPkgInternal = errors.New("failed something in subpkg")
 
-// failSubPkg2 returns a Gerror from failSubPkg2.
-func failPkg() Gerror {
+// failSubPkg2 returns a g.Error from failSubPkg2.
+func failPkg() g.Error {
 	if err := failSubPkg2(); err != nil {
-		e := PkgErrorf("%w", errPkgInternal)
-		return GLink(e, err)
+		return wrapperPkg.Link(errPkgInternal, err)
 	}
 	return nil
 }

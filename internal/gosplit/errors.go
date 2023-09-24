@@ -1,18 +1,13 @@
 package gosplit
 
 import (
-	. "inaz2/GoSplit/internal/gerrors"
+	g "inaz2/GoSplit/internal/gerrors"
 
 	"errors"
 )
 
 // ErrGoSplit represents any errors in this package.
 var ErrGoSplit = errors.New("gosplit")
-
-// GoSplitErrorf returns a new Gerror from ErrGoSplit.
-func GoSplitErrorf(format string, a ...any) Gerror {
-	return GErrorf(ErrGoSplit, format, a...)
-}
 
 // Specific errors.
 var (
@@ -24,3 +19,6 @@ var (
 	ErrNoFreeSpace     = errors.New("no free space available")
 	ErrSuffixExhausted = errors.New("output file suffixes exhausted")
 )
+
+// wrapper is a error wrapper for this package.
+var wrapper = g.NewWrapper(ErrGoSplit)
