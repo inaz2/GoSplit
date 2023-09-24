@@ -56,7 +56,7 @@ func (e *errorWithStack) Format(f fmt.State, verb rune) {
 	fmt.Fprint(f, msg)
 }
 
-// Wrapper represents base error. The error string of base error is discarded.
+// Wrapper provides the methods for wrapping an error with base error. The error string of base error is discarded.
 //
 // Intended to use Wrapper.Errorf instead of fmt.Errorf.
 type Wrapper struct {
