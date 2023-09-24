@@ -36,7 +36,7 @@ func (e *errorWithStack) Unwrap() error {
 	return e.err
 }
 
-// GoString implemenrts fmt.GoStringer.
+// GoString implements fmt.GoStringer.
 func (e *errorWithStack) GoString() string {
 	return fmt.Sprintf("&gerrors.errorWithStack{err: %#v, stack: %#v}", e.err, e.stack)
 }
