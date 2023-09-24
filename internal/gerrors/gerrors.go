@@ -56,44 +56,44 @@ func (e *errorWithStack) Format(f fmt.State, verb rune) {
 	fmt.Fprint(f, msg)
 }
 
-// Wrapper provides the methods for wrapping an error with base error.
+// Wrapper provides the methods for a wrapped error with the base error.
 //
 // Intended to use Wrapper.Errorf instead of fmt.Errorf.
 type Wrapper struct {
 	errBase error
 }
 
-// NewWrapper returns a new Wrapper of err. The error string of base error is discarded.
-func NewWrapper(err error) *Wrapper {
-	return &Wrapper{errBase: err}
+// NewWrapper returns a new Wrapper of a base error.
+func NewWrapper(errBase error) *Wrapper {
+	return &Wrapper{errBase: errBase}
 }
 
-// Errorf returns a new Error by formatting.
+// Errorf returns a new Error by formatting. The error string of the base error is discarded.
 func (w *Wrapper) Errorf(format string, a ...any) Error {
 	err := fmt.Errorf(format, a...)
-	return w.Link(err, w.errBase)
-}
 
-// Link returns a new Error linked to errOld. The error string of errOld is discarded.
-func (w *Wrapper) Link(errNew error, errOld error) Error {
-	// append errOld by zero-length format specifier "%.w"
-	// because errNew is expected to be handled earlier
-	err := fmt.Errorf("%w%.w", errNew, errOld)
-
-	// prepend a base error if err is not wrapped by it
-	// because a base error is expected to be handled earlier
+	// check err is linked to the base error to avoid duplicate it
 	if !errors.Is(err, w.errBase) {
+		// prepend the base error by zero-length format specifier "%.w"
+		// because it is expected to be handled earlier
 		err = fmt.Errorf("%.w%w", w.errBase, err)
 	}
 
+	// find a stacktrace or generate it
 	var stack []byte
 	var tmp *errorWithStack
 	if errors.As(err, &tmp) {
-		// keep original stacktrace
 		stack = tmp.stack
 	} else {
 		stack = debug.Stack()
 	}
 
 	return &errorWithStack{err: err, stack: stack}
+}
+
+// Link returns a new Error linked to errOld. The error string of errOld is discarded.
+func (w *Wrapper) Link(errNew error, errOld error) Error {
+	// append errOld by zero-length format specifier "%.w"
+	// because it is expected to be handled later
+	return w.Errorf("%w%.w", errNew, errOld)
 }
