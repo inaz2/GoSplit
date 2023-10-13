@@ -136,7 +136,7 @@ func TestIs(t *testing.T) {
 	}
 }
 
-func TestJoin_Format(t *testing.T) {
+func TestLink_Format(t *testing.T) {
 	t.Parallel()
 
 	err := failPkg()
@@ -148,7 +148,7 @@ func TestJoin_Format(t *testing.T) {
 	}
 }
 
-func TestJoin_Format_Stack(t *testing.T) {
+func TestLink_Format_Stack(t *testing.T) {
 	t.Parallel()
 
 	err := failPkg()
@@ -167,7 +167,7 @@ func TestJoin_Format_Stack(t *testing.T) {
 	}
 }
 
-func TestJoin_Is(t *testing.T) {
+func TestLink_Is(t *testing.T) {
 	t.Parallel()
 
 	err := failPkg()
