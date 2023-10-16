@@ -3,15 +3,14 @@ package gosplit
 
 import (
 	g "inaz2/GoSplit/internal/gerrors"
-	"inaz2/GoSplit/internal/safeint"
 
 	"bufio"
 	"fmt"
 	"io"
+	"math/big"
 	"os"
 	"path"
 	"regexp"
-	"strconv"
 )
 
 // GoSplit provides the methods for splitting the file.
@@ -64,16 +63,10 @@ func (g *GoSplit) ParseSize(strSize string) (int64, g.Error) {
 		return 0, wrapper.Errorf("%w: %#v", ErrInvalidBytes, strSize)
 	}
 
-	x, err := strconv.ParseInt(m[1], 10, 64)
-	if err != nil {
-		return 0, wrapper.Errorf("%w: %#v", ErrInvalidBytes, strSize)
-	}
+	x := new(big.Int)
+	x.SetString(m[1], 10)
 
-	var (
-		base       int64
-		multiplier int64
-	)
-
+	var base int64
 	switch m[4] {
 	case "B":
 		base = 1000
@@ -83,11 +76,12 @@ func (g *GoSplit) ParseSize(strSize string) (int64, g.Error) {
 		base = 1024
 	}
 
+	multiplier := new(big.Int)
 	switch m[2] {
 	case "":
-		multiplier = 1
+		multiplier.SetInt64(1)
 	case "b":
-		multiplier = 512
+		multiplier.SetInt64(512)
 	default:
 		exponentMap := map[string]int64{
 			"E": 6, "G": 3, "K": 1, "k": 1, "M": 2, "m": 2,
@@ -97,19 +91,15 @@ func (g *GoSplit) ParseSize(strSize string) (int64, g.Error) {
 		if !ok {
 			return 0, wrapper.Errorf("%w: %#v", ErrInvalidBytes, strSize)
 		}
-		multiplier, err = safeint.PowInt64(base, exponent)
-		if err != nil {
-			e := wrapper.Errorf("%w: %#v: Value too large for defined data type", ErrInvalidBytes, strSize)
-			return 0, wrapper.Link(e, err)
-		}
+		multiplier.Exp(big.NewInt(base), big.NewInt(exponent), nil)
 	}
 
-	n, err := safeint.MulInt64(x, multiplier)
-	if err != nil {
-		e := wrapper.Errorf("%w: %#v: Value too large for defined data type", ErrInvalidBytes, strSize)
-		return 0, wrapper.Link(e, err)
+	x.Mul(x, multiplier)
+	if !x.IsInt64() {
+		return 0, wrapper.Errorf("%w: %#v: Value too large for defined data type", ErrInvalidBytes, strSize)
 	}
 
+	n := x.Int64()
 	if n <= 0 {
 		return 0, wrapper.Errorf("%w: %#v: Numerical result out of range", ErrInvalidBytes, strSize)
 	}
